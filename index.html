@@ -270,9 +270,10 @@ async function buildShareMessage() {
     }
     return linea;
   });
-  let msg=titulo+lineas.join('\n\n');
-  if(CURRENT_RESULTS.length>MAX) msg+=`\n\n_...y ${CURRENT_RESULTS.length-MAX} más._`;
-  msg+='\n\n_Arima Cool Tour_';
+  const separador = '\n\n━━━━━━━━━━━━━━━\n\n';
+  let msg=titulo+lineas.join(separador);
+  if(CURRENT_RESULTS.length>MAX) msg+=`${separador}_...y ${CURRENT_RESULTS.length-MAX} más._`;
+  msg+=`${separador}_Arima Cool Tour_`;
   return msg;
 }
 async function shareWhatsApp() {
