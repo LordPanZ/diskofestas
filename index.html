@@ -230,6 +230,62 @@ function getKontaktua(e) {
   const custom=extractNota(e.notas, ['kontaktua','contacto','tel[ée]fono','tel','phone']);
   return custom || '665712802';
 }
+function extractProvincia(location) {
+  if(!location) return '';
+  const t = location.toLowerCase();
+  // Por nombre explícito (castellano o euskera)
+  if(/\b(bizkaia|vizcaya)\b/i.test(location)) return 'Bizkaia';
+  if(/\b(gipuzkoa|guip[uú]zcoa)\b/i.test(location)) return 'Gipuzkoa';
+  if(/\b(araba|[aá]lava)\b/i.test(location)) return 'Araba';
+  if(/\b(nafarroa|navarra)\b/i.test(location)) return 'Nafarroa';
+  // Por código postal
+  const cp = location.match(/\b(\d{5})\b/);
+  if(cp) {
+    const p = cp[1].slice(0,2);
+    if(p==='48') return 'Bizkaia';
+    if(p==='20') return 'Gipuzkoa';
+    if(p==='01') return 'Araba';
+    if(p==='31') return 'Nafarroa';
+  }
+  return '';
+}
+function extractCalleYPueblo(location, pueblo) {
+  if(!location) return { calle:'', pueblo: pueblo||'' };
+  // Partes separadas por coma
+  let parts = location.split(',').map(s=>s.trim()).filter(Boolean);
+  // Quitar España / Spain del final
+  while(parts.length && /^(espa[ñn]a|spain)$/i.test(parts[parts.length-1])) parts.pop();
+  // Quitar provincia del final
+  while(parts.length && /\b(bizkaia|vizcaya|gipuzkoa|guip[uú]zcoa|araba|[aá]lava|nafarroa|navarra)\b/i.test(parts[parts.length-1])) parts.pop();
+  // Buscar parte con CP para extraer pueblo
+  let calleParts = [];
+  let puebloDetectado = '';
+  for(const part of parts) {
+    const cpMatch = part.match(/^\s*(\d{5})\s+(.+)$/);
+    if(cpMatch) {
+      puebloDetectado = cpMatch[2].trim();
+    } else if(!puebloDetectado) {
+      calleParts.push(part);
+    }
+  }
+  // Si no se detectó CP, usar última parte como pueblo (si hay más de una)
+  if(!puebloDetectado && calleParts.length > 1) {
+    puebloDetectado = calleParts.pop();
+  }
+  const calle = calleParts.join(', ').trim();
+  const puebloFinal = puebloDetectado || pueblo || '';
+  return { calle, pueblo: puebloFinal };
+}
+function getLekua(e) {
+  const loc = e.location || '';
+  const { calle, pueblo } = extractCalleYPueblo(loc, e.pueblo||'');
+  const provincia = extractProvincia(loc);
+  const puebloConProv = provincia ? `${pueblo} (${provincia})` : pueblo;
+  if(calle && puebloConProv) return `${calle}, ${puebloConProv}`;
+  if(calle) return calle;
+  if(puebloConProv) return puebloConProv;
+  return 'Por confirmar';
+}
 function limpiarFiltros() { $('fAnimador').value=''; $('fDJ').value=''; $('fPueblo').value=''; $('fDesde').value=''; $('fHasta').value=''; $('fTexto').value=''; applyFilters(); }
 function escapeHtml(s) { return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function renderResults() {
@@ -288,11 +344,13 @@ async function buildShareMessage() {
       const desmuntaia = (e.hora_final && e.hora_final!=='00:00') ? addMinutes(e.hora_final, 60) : 'Por confirmar';
       const aparkatzeko = getAparkatzeko(e);
       const kontaktua = getKontaktua(e);
+      const lekua = getLekua(e);
       return [
         `* *Bezeroa*: ${e.pueblo||'(sin pueblo)'}`,
         `* *Diskofesta*: ${diskofesta}`,
         `* *Data*: ${dataFmt}`,
         `* *Ordutegia*: ${ordutegia}`,
+        `* *Lekua*: ${lekua}`,
         `* *Muntaia*: ${muntaia}`,
         `* *Desmuntaia*: ${desmuntaia}`,
         `* *Beharrak*: Entxufe normal bat 230V eta posible bada 6x4ko eszenatokia edo handiagoa`,
