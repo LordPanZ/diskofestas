@@ -105,7 +105,7 @@
   <div class="filters-body" id="filtersBody">
     <div class="field"><label for="fAnimador">Animador</label><select id="fAnimador"><option value="">Todos</option></select></div>
     <div class="field"><label for="fDJ">DJ</label><select id="fDJ"><option value="">Todos</option></select></div>
-    <div class="field"><label for="fPueblo">Pueblo</label><input type="text" id="fPueblo" placeholder="Ej: Zumaia"></div>
+    <div class="field"><label for="fPueblo">Bezeroa</label><select id="fPueblo"><option value="">Todos</option></select></div>
     <div class="field"><label for="fDesde">Desde</label><input type="date" id="fDesde"></div>
     <div class="field"><label for="fHasta">Hasta</label><input type="date" id="fHasta"></div>
     <div class="field"><label for="fTexto">Texto libre</label><input type="text" id="fTexto" placeholder="Buscar en notas..."></div>
@@ -178,25 +178,57 @@ const HOY = hoyISO();
 const FUTUROS = EVENTS_DATA.filter(e=>e.fecha>=HOY).sort((a,b)=>a.fecha.localeCompare(b.fecha)||(a.hora_inicio||'').localeCompare(b.hora_inicio||''));
 let CURRENT_RESULTS = FUTUROS.slice();
 function populateSelects() {
-  const animSet=new Set(), djSet=new Set();
-  FUTUROS.forEach(e=>{ animadoresDe(e).forEach(a=>animSet.add(a)); djsDe(e).forEach(d=>djSet.add(d)); });
-  const sA=$('fAnimador'), sD=$('fDJ');
+  const animSet=new Set(), djSet=new Set(), puebloSet=new Set();
+  FUTUROS.forEach(e=>{
+    animadoresDe(e).forEach(a=>animSet.add(a));
+    djsDe(e).forEach(d=>djSet.add(d));
+    if(e.pueblo && e.pueblo.trim()) puebloSet.add(e.pueblo.trim());
+  });
+  const sA=$('fAnimador'), sD=$('fDJ'), sP=$('fPueblo');
   [...animSet].sort((a,b)=>a.localeCompare(b,'es')).forEach(a=>{ const o=document.createElement('option'); o.value=a; o.textContent=a; sA.appendChild(o); });
   [...djSet].sort((a,b)=>a.localeCompare(b,'es')).forEach(d=>{ const o=document.createElement('option'); o.value=d; o.textContent=d; sD.appendChild(o); });
+  [...puebloSet].sort((a,b)=>a.localeCompare(b,'es')).forEach(p=>{ const o=document.createElement('option'); o.value=p; o.textContent=p; sP.appendChild(o); });
 }
 function applyFilters() {
-  const fa=$('fAnimador').value.trim(), fd=$('fDJ').value.trim(), fp=normalize($('fPueblo').value);
+  const fa=$('fAnimador').value.trim(), fd=$('fDJ').value.trim(), fp=$('fPueblo').value.trim();
   const fDesde=$('fDesde').value, fHasta=$('fHasta').value, fTxt=normalize($('fTexto').value);
   CURRENT_RESULTS=FUTUROS.filter(e=>{
     if(fa && !animadoresDe(e).map(normalize).some(a=>a===normalize(fa))) return false;
     if(fd && !djsDe(e).map(normalize).some(d=>d===normalize(fd))) return false;
-    if(fp && !normalize(e.pueblo).includes(fp)) return false;
+    if(fp && normalize(e.pueblo)!==normalize(fp)) return false;
     if(fDesde && e.fecha<fDesde) return false;
     if(fHasta && e.fecha>fHasta) return false;
     if(fTxt && !normalize(`${e.pueblo} ${e.animador} ${e.dj} ${e.notas} ${e.titulo}`).includes(fTxt)) return false;
     return true;
   });
   renderResults();
+}
+// ===== Helpers para formato detallado (Bezeroa) =====
+function addMinutes(hora, mins) {
+  if(!hora || !/^\d{2}:\d{2}$/.test(hora)) return '';
+  const [h,m]=hora.split(':').map(Number);
+  let total=h*60+m+mins;
+  if(total<0) total+=24*60;
+  if(total>=24*60) total-=24*60;
+  const nh=Math.floor(total/60)%24, nm=total%60;
+  return String(nh).padStart(2,'0')+':'+String(nm).padStart(2,'0');
+}
+function extractNota(notas, labels) {
+  if(!notas) return '';
+  for(const label of labels){
+    const re=new RegExp('\\b'+label+'\\s*[:\\-]\\s*([^|\\n]+)','i');
+    const m=notas.match(re);
+    if(m){ const v=m[1].trim(); if(v) return v; }
+  }
+  return '';
+}
+function getAparkatzeko(e) {
+  const custom=extractNota(e.notas, ['aparkatzeko leku','aparkatzeko','aparcamiento','parking','furgoneta','matr[ií]cula']);
+  return custom || 'Ford Transit 5154 KWY';
+}
+function getKontaktua(e) {
+  const custom=extractNota(e.notas, ['kontaktua','contacto','tel[ée]fono','tel','phone']);
+  return custom || '665712802';
 }
 function limpiarFiltros() { $('fAnimador').value=''; $('fDJ').value=''; $('fPueblo').value=''; $('fDesde').value=''; $('fHasta').value=''; $('fTexto').value=''; applyFilters(); }
 function escapeHtml(s) { return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -238,17 +270,52 @@ async function buildShareMessage() {
   if(!CURRENT_RESULTS.length) return '🎉 *Diskofestas* — no hay eventos con los filtros actuales.';
   const fa=$('fAnimador').value.trim(), fd=$('fDJ').value.trim(), fp=$('fPueblo').value.trim();
   const fDesde=$('fDesde').value, fHasta=$('fHasta').value;
+  const separador = '\n\n━━━━━━━━━━━━━━━\n\n';
+  const MAX=40;
+  const eventosAMostrar = CURRENT_RESULTS.slice(0,MAX);
+  const year = new Date().getFullYear();
+
+  // === FORMATO DETALLADO (cuando se filtra por Bezeroa) ===
+  if(fp) {
+    const bloques = eventosAMostrar.map(e=>{
+      const anims = animadoresDe(e);
+      const djs = djsDe(e);
+      const diskofestaParts = [...djs.map(d=>`DJ ${d}`), ...anims];
+      const diskofesta = diskofestaParts.length ? diskofestaParts.join(' + ') : '(sin asignar)';
+      const dataFmt = (e.fecha||'').replace(/-/g,'/');
+      const ordutegia = (e.hora_inicio && e.hora_final && e.hora_inicio!=='00:00' && e.hora_final!=='00:00') ? `${e.hora_inicio} - ${e.hora_final}` : (e.hora_inicio && e.hora_inicio!=='00:00' ? e.hora_inicio : 'Por confirmar');
+      const muntaia = (e.hora_inicio && e.hora_inicio!=='00:00') ? addMinutes(e.hora_inicio, -90) : 'Por confirmar';
+      const desmuntaia = (e.hora_final && e.hora_final!=='00:00') ? addMinutes(e.hora_final, 60) : 'Por confirmar';
+      const aparkatzeko = getAparkatzeko(e);
+      const kontaktua = getKontaktua(e);
+      return [
+        `* *Bezeroa*: ${e.pueblo||'(sin pueblo)'}`,
+        `* *Diskofesta*: ${diskofesta}`,
+        `* *Data*: ${dataFmt}`,
+        `* *Ordutegia*: ${ordutegia}`,
+        `* *Muntaia*: ${muntaia}`,
+        `* *Desmuntaia*: ${desmuntaia}`,
+        `* *Beharrak*: Entxufe normal bat 230V eta posible bada 6x4ko eszenatokia edo handiagoa`,
+        `* *Aparkatzeko leku erreserbatua*: ${aparkatzeko}`,
+        `* *Kontaktua*: ${kontaktua}`,
+      ].join('\n');
+    });
+    let msg = `🎉 *Diskofesta — ${fp}*\n📊 ${CURRENT_RESULTS.length} ekitaldi\n`;
+    msg += separador.replace(/^\n\n/,'\n') + bloques.join(separador);
+    if(CURRENT_RESULTS.length>MAX) msg += `${separador}_...eta ${CURRENT_RESULTS.length-MAX} gehiago._`;
+    msg += `${separador}_diskofesta.eus® ${year}_`;
+    return msg;
+  }
+
+  // === FORMATO COMPACTO (filtro por Animador/DJ u otros) ===
   let titulo='🎉 *Listado de Diskofestas*\n';
   const crit=[];
   if(fa) crit.push(`Animador: ${fa}`);
   if(fd) crit.push(`DJ: ${fd}`);
-  if(fp) crit.push(`Pueblo: ${fp}`);
   if(fDesde) crit.push(`Desde: ${formatFechaCorta(fDesde)}`);
   if(fHasta) crit.push(`Hasta: ${formatFechaCorta(fHasta)}`);
   if(crit.length) titulo+=`_${crit.join(' · ')}_\n`;
   titulo+=`📊 ${CURRENT_RESULTS.length} evento${CURRENT_RESULTS.length===1?'':'s'}\n\n`;
-  const MAX=40;
-  const eventosAMostrar = CURRENT_RESULTS.slice(0,MAX);
   // Acorta las URLs de Maps en paralelo
   const urlsShort = await Promise.all(eventosAMostrar.map(e=>{
     if(!e.location) return Promise.resolve('');
@@ -270,7 +337,6 @@ async function buildShareMessage() {
     }
     return linea;
   });
-  const separador = '\n\n━━━━━━━━━━━━━━━\n\n';
   let msg=titulo+lineas.join(separador);
   if(CURRENT_RESULTS.length>MAX) msg+=`${separador}_...y ${CURRENT_RESULTS.length-MAX} más._`;
   msg+=`${separador}_Arima Cool Tour_`;
