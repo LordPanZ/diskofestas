@@ -205,12 +205,12 @@ function populateSelects() {
 }
 function applyFilters() {
   const fa=$('fAnimador').value.trim(), fd=$('fDJ').value.trim(), fp=$('fPueblo').value.trim();
-  const fDesde=$('fDesde').value, fHasta=$('fHasta').value, fTxt=normalize($('fTexto').value);
+  const fDesde=$('fDesde').value || hoyISO(), fHasta=$('fHasta').value, fTxt=normalize($('fTexto').value);
   CURRENT_RESULTS=FUTUROS.filter(e=>{
     if(fa && !animadoresDe(e).map(normalize).some(a=>a===normalize(fa))) return false;
     if(fd && !djsDe(e).map(normalize).some(d=>d===normalize(fd))) return false;
     if(fp && normalize(e.pueblo)!==normalize(fp)) return false;
-    if(fDesde && e.fecha<fDesde) return false;
+    if(e.fecha<fDesde) return false;
     if(fHasta && e.fecha>fHasta) return false;
     if(fTxt && !normalize(`${e.pueblo} ${e.animador} ${e.dj} ${e.notas} ${e.titulo}`).includes(fTxt)) return false;
     return true;
@@ -392,7 +392,7 @@ function getPersonaConTarifa() {
 }
 function formatTarifa(tKey) { return tKey===90 ? '1h30' : (tKey===120 ? '2h' : ''); }
 
-function limpiarFiltros() { $('fAnimador').value=''; $('fDJ').value=''; $('fPueblo').value=''; $('fDesde').value=''; $('fHasta').value=''; $('fTexto').value=''; applyFilters(); }
+function limpiarFiltros() { $('fAnimador').value=''; $('fDJ').value=''; $('fPueblo').value=''; $('fDesde').value=hoyISO(); $('fHasta').value=''; $('fTexto').value=''; applyFilters(); }
 function escapeHtml(s) { return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function renderResults() {
   const cont=$('results'); $('resultCount').textContent=CURRENT_RESULTS.length;
@@ -453,4 +453,107 @@ function renderResults() {
 const SHORT_URL_CACHE = new Map();
 async function shortenUrl(longUrl) {
   if(!longUrl) return longUrl;
-  if(SHORT_URL_CACHE.has(longUrl)) return SHORT_UR
+  if(SHORT_URL_CACHE.has(longUrl)) return SHORT_URL_CACHE.get(longUrl);
+  try {
+    const r = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(longUrl), {signal: AbortSignal.timeout(4000)});
+    if(r.ok){ const short = (await r.text()).trim(); if(short.startsWith('http')){ SHORT_URL_CACHE.set(longUrl, short); return short; } }
+  } catch(e){}
+  return longUrl;
+}
+
+async function shareResults() {
+  const fa = $('fAnimador').value.trim();
+  const fd = $('fDJ').value.trim();
+  const fp = $('fPueblo').value.trim();
+  const fD = $('fDesde').value;
+  const fH = $('fHasta').value;
+  const fT = $('fTexto').value.trim();
+
+  const n = CURRENT_RESULTS.length;
+  if(!n){ alert('No hay resultados para compartir.'); return; }
+
+  let filtrosDesc = [];
+  if(fa) filtrosDesc.push('Animador: ' + fa);
+  if(fd) filtrosDesc.push('DJ: ' + fd);
+  if(fp) filtrosDesc.push('Lugar: ' + fp);
+  if(fD) filtrosDesc.push('Desde: ' + fD);
+  if(fH) filtrosDesc.push('Hasta: ' + fH);
+  if(fT) filtrosDesc.push('Texto: ' + fT);
+
+  let lines = ['\uD83C\uDF89 *Diskofestas - Arima Cool Tour*'];
+  if(filtrosDesc.length) lines.push('Filtros: ' + filtrosDesc.join(' | '));
+  lines.push(n + ' evento' + (n===1?'':'s') + ':\n');
+
+  CURRENT_RESULTS.forEach(function(e) {
+    const anims = animadoresDe(e).join(' + ') || '';
+    const djs   = djsDe(e).join(' + ') || '';
+    let line = '\uD83D\uDCC5 ' + formatFechaCorta(e.fecha) + ' ' + (e.hora_inicio||'') + ' \uD83C\uDFF8\uFE0F ' + (e.pueblo||'');
+    if(anims) line += ' \uD83D\uDC64 ' + anims;
+    if(djs)   line += ' \uD83C\uDFA7 ' + djs;
+    lines.push(line);
+  });
+
+  const msg = lines.join('\n');
+  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  window.open(waUrl, '_blank');
+}
+
+// ===== INICIALIZACION =====
+function init() {
+  // Fecha de hoy en el header
+  const hoy = new Date();
+  const dias = ['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
+  document.getElementById('fechaHoy').textContent = dias[hoy.getDay()] + ' ' + hoy.toLocaleDateString('es-ES', {day:'2-digit', month:'2-digit', year:'numeric'});
+  document.getElementById('totalEvents').textContent = EVENTS_DATA.length;
+  document.getElementById('lastUpdate').textContent = GENERATED_AT;
+
+  // Filtro "Desde hoy" por defecto
+  document.getElementById('fDesde').value = hoyISO();
+
+  // Poblar selects
+  populateSelects();
+
+  // Aplicar filtros iniciales
+  applyFilters();
+
+  // Botones de filtro
+  document.getElementById('btnAplicar').addEventListener('click', applyFilters);
+  document.getElementById('btnLimpiar').addEventListener('click', limpiarFiltros);
+
+  // Filtrado en tiempo real al cambiar selects e inputs
+  document.getElementById('fAnimador').addEventListener('change', applyFilters);
+  document.getElementById('fDJ').addEventListener('change', applyFilters);
+  document.getElementById('fPueblo').addEventListener('change', applyFilters);
+  document.getElementById('fDesde').addEventListener('change', applyFilters);
+  document.getElementById('fHasta').addEventListener('change', applyFilters);
+  document.getElementById('fTexto').addEventListener('input', applyFilters);
+
+  // Toggle filtros
+  document.getElementById('btnToggleFilters').addEventListener('click', function() {
+    const body = document.getElementById('filtersBody');
+    const collapsed = body.classList.toggle('collapsed');
+    this.textContent = collapsed ? '\u25BC' : '\u25B2';
+  });
+
+  // Boton compartir WhatsApp
+  document.getElementById('btnShare').addEventListener('click', shareResults);
+
+  // PWA install
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installBanner').classList.add('visible');
+  });
+  document.getElementById('btnInstall').addEventListener('click', async function() {
+    if(!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const result = await deferredPrompt.userChoice;
+    if(result.outcome === 'accepted') document.getElementById('installBanner').classList.remove('visible');
+    deferredPrompt = null;
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
