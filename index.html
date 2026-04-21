@@ -426,7 +426,10 @@ function renderResults() {
     const anims=animadoresDe(e), djs=djsDe(e);
     const chipsAnim=anims.map(a=>`<span class="chip">👤 ${escapeHtml(a)}</span>`).join('');
     const chipsDj=djs.map(d=>`<span class="chip dj">🎧 ${escapeHtml(d)}</span>`).join('');
-    const chipLugar=e.location?`<span class="chip lugar">📍 ${escapeHtml(e.location)}</span>`:'';
+    const mapsQuery = encodeURIComponent(e.location || e.pueblo || '');
+    const mapsUrl = mapsQuery ? `https://www.google.com/maps/dir/?api=1&destination=${mapsQuery}` : '';
+    const mapsLabel = e.location ? escapeHtml(e.location) : escapeHtml(e.pueblo || '');
+    const chipLugar = mapsUrl ? `<a class="chip lugar" href="${mapsUrl}" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">📍 ${mapsLabel} 🗺️</a>` : '';
     let chipPrecio = '';
     const p = precios[idx];
     if(p) {
@@ -545,15 +548,4 @@ function init() {
     deferredPrompt = e;
     document.getElementById('installBanner').classList.add('visible');
   });
-  document.getElementById('btnInstall').addEventListener('click', async function() {
-    if(!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const result = await deferredPrompt.userChoice;
-    if(result.outcome === 'accepted') document.getElementById('installBanner').classList.remove('visible');
-    deferredPrompt = null;
-  });
-}
-
-document.addEventListener('DOMContentLoaded', init);
-</script>
-</body>
+  document.getElementById('btnInstall').addEventListener('clic
