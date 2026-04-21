@@ -107,19 +107,19 @@
 <section class="filters">
   <div class="filters-header">
     <h2>🔍 Filtros</h2>
-    <button class="toggle" id="btnToggleFilters" aria-label="Plegar filtros">▲</button>
+    <button class="toggle" id="btnToggleFilters" aria-label="Plegar filtros" onclick="toggleFiltros(this)">▲</button>
   </div>
   <div class="filters-body" id="filtersBody">
-    <div class="field"><label for="fAnimador">Animador</label><select id="fAnimador"><option value="">Todos</option></select></div>
-    <div class="field"><label for="fDJ">DJ</label><select id="fDJ"><option value="">Todos</option></select></div>
-    <div class="field"><label for="fPueblo">Bezeroa</label><select id="fPueblo"><option value="">Todos</option></select></div>
-    <div class="field"><label for="fDesde">Desde</label><input type="date" id="fDesde"></div>
-    <div class="field"><label for="fHasta">Hasta</label><input type="date" id="fHasta"></div>
-    <div class="field"><label for="fTexto">Texto libre</label><input type="text" id="fTexto" placeholder="Buscar en notas..."></div>
+    <div class="field"><label for="fAnimador">Animador</label><select id="fAnimador" onchange="applyFilters()"><option value="">Todos</option></select></div>
+    <div class="field"><label for="fDJ">DJ</label><select id="fDJ" onchange="applyFilters()"><option value="">Todos</option></select></div>
+    <div class="field"><label for="fPueblo">Bezeroa</label><select id="fPueblo" onchange="applyFilters()"><option value="">Todos</option></select></div>
+    <div class="field"><label for="fDesde">Desde</label><input type="date" id="fDesde" onchange="applyFilters()"></div>
+    <div class="field"><label for="fHasta">Hasta</label><input type="date" id="fHasta" onchange="applyFilters()"></div>
+    <div class="field"><label for="fTexto">Texto libre</label><input type="text" id="fTexto" placeholder="Buscar en notas..." oninput="applyFilters()"></div>
   </div>
   <div class="filter-actions">
-    <button class="btn btn-ghost" id="btnLimpiar">Limpiar</button>
-    <button class="btn btn-primary" id="btnAplicar">Aplicar</button>
+    <button class="btn btn-ghost" id="btnLimpiar" onclick="limpiarFiltros()">Limpiar</button>
+    <button class="btn btn-primary" id="btnAplicar" onclick="applyFilters()">Aplicar</button>
   </div>
 </section>
 <div class="count-bar"><span>📋 Resultados</span><span class="count-num" id="resultCount">0</span></div>
@@ -135,7 +135,7 @@
   📅 Datos sincronizados desde Google Calendar de <b>arimacooltour@gmail.com</b><br>
   Última actualización: <span id="lastUpdate"></span>.
 </div>
-<button class="fab-share" id="btnShare">
+<button class="fab-share" id="btnShare" onclick="shareResults()">
   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.52 3.45C18.24 1.17 15.24 0 12 0 5.37 0 0 5.37 0 12c0 2.11.55 4.16 1.6 5.97L0 24l6.25-1.64C8 23.45 9.99 24 12 24c6.63 0 12-5.37 12-12 0-3.21-1.26-6.23-3.48-8.55zm-8.52 18.4c-1.76 0-3.48-.47-4.97-1.36l-.36-.21-3.71.97.99-3.62-.23-.37A9.94 9.94 0 0 1 2 12c0-5.52 4.48-10 10-10 2.67 0 5.18 1.04 7.07 2.93A9.93 9.93 0 0 1 22 12c0 5.52-4.48 9.85-10 9.85zm5.45-7.44c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.88-.78-1.47-1.74-1.65-2.04-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.25-.59-.5-.5-.67-.51H8.7c-.17 0-.45.06-.69.3-.24.24-.91.89-.91 2.16 0 1.27.93 2.5 1.06 2.67.13.17 1.83 2.8 4.44 3.93.62.27 1.1.43 1.48.55.62.2 1.19.17 1.64.1.5-.07 1.54-.63 1.76-1.24.22-.62.22-1.14.16-1.25-.06-.11-.24-.17-.54-.32z"/></svg>
   Compartir por WhatsApp
 </button>
@@ -192,6 +192,27 @@ const HOY = hoyISO();
 // Ahora trabajamos con TODOS los eventos (pasados + futuros). El filtro por defecto "Desde hoy" sigue aplicándose, pero el usuario puede borrarlo o retroceder la fecha para buscar eventos anteriores.
 const FUTUROS = EVENTS_DATA.slice().sort((a,b)=>a.fecha.localeCompare(b.fecha)||(a.hora_inicio||'').localeCompare(b.hora_inicio||''));
 let CURRENT_RESULTS = FUTUROS.slice();
+
+// ===== INIT INLINE =====
+function toggleFiltros(btn) {
+  var body = document.getElementById('filtersBody');
+  var collapsed = body.classList.toggle('collapsed');
+  btn.textContent = collapsed ? '▼' : '▲';
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var hoy = new Date();
+  var dias = ['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
+  document.getElementById('fechaHoy').textContent = dias[hoy.getDay()] + ' ' + hoy.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'});
+  document.getElementById('totalEvents').textContent = EVENTS_DATA.length;
+  document.getElementById('lastUpdate').textContent = GENERATED_AT;
+  document.getElementById('fDesde').value = hoyISO();
+  populateSelects();
+  applyFilters();
+  var dp;
+  window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); dp=e; document.getElementById('installBanner').classList.add('visible'); });
+  document.getElementById('btnInstall').addEventListener('click', function(){ if(!dp) return; dp.prompt(); dp.userChoice.then(function(r){ if(r.outcome==='accepted') document.getElementById('installBanner').classList.remove('visible'); dp=null; }); });
+});
+
 function populateSelects() {
   const animSet=new Set(), djSet=new Set(), puebloSet=new Set();
   // Solo eventos desde hoy para que los desplegables coincidan con lo que se muestra
