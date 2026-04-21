@@ -548,4 +548,16 @@ function init() {
     deferredPrompt = e;
     document.getElementById('installBanner').classList.add('visible');
   });
-  document.getElementById('btnInstall').addEventListener('clic
+  document.getElementById('btnInstall').addEventListener('click', async function() {
+    if(!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const result = await deferredPrompt.userChoice;
+    if(result.outcome === 'accepted') document.getElementById('installBanner').classList.remove('visible');
+    deferredPrompt = null;
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
