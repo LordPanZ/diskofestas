@@ -506,22 +506,63 @@ async function shareResults() {
   let filtrosDesc = [];
   if(fa) filtrosDesc.push('Animador: ' + fa);
   if(fd) filtrosDesc.push('DJ: ' + fd);
-  if(fp) filtrosDesc.push('Lugar: ' + fp);
+  if(fp) filtrosDesc.push('Bezeroa: ' + fp);
   if(fD) filtrosDesc.push('Desde: ' + fD);
   if(fH) filtrosDesc.push('Hasta: ' + fH);
   if(fT) filtrosDesc.push('Texto: ' + fT);
 
+  // Modo DETALLADO: cuando hay Bezeroa seleccionado, se incluye info completa
+  // por evento (lugar, fecha, hora inicio/final, hora montaje, matricula,
+  // kontaktua, aparkatzeko, notas, precio).
+  const modoDetalle = !!fp;
+
   let lines = ['\uD83C\uDF89 *Diskofestas - Arima Cool Tour*'];
   if(filtrosDesc.length) lines.push('Filtros: ' + filtrosDesc.join(' | '));
-  lines.push(n + ' evento' + (n===1?'':'s') + ':\n');
+  lines.push(n + ' evento' + (n===1?'':'s') + ':');
 
-  CURRENT_RESULTS.forEach(function(e) {
+  const persona = getPersonaConTarifa();
+
+  CURRENT_RESULTS.forEach(function(e, idx) {
     const anims = animadoresDe(e).join(' + ') || '';
     const djs   = djsDe(e).join(' + ') || '';
-    let line = '\uD83D\uDCC5 ' + formatFechaCorta(e.fecha) + ' ' + (e.hora_inicio||'') + ' \uD83C\uDFF8\uFE0F ' + (e.pueblo||'');
-    if(anims) line += ' \uD83D\uDC64 ' + anims;
-    if(djs)   line += ' \uD83C\uDFA7 ' + djs;
-    lines.push(line);
+    if(modoDetalle) {
+      lines.push('');
+      lines.push('\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500');
+      lines.push('\uD83D\uDCC5 *' + formatFechaCorta(e.fecha) + '*' + (e.pueblo ? ' \u2022 ' + e.pueblo : ''));
+      const hi = e.hora_inicio || '';
+      const hf = e.hora_final  || '';
+      if(hi || hf) {
+        let hLine = '\uD83D\uDD50 Ordutegia: ';
+        if(hi && hf) hLine += hi + ' \u2013 ' + hf;
+        else hLine += (hi || hf);
+        lines.push(hLine);
+      }
+      if(hi) {
+        const montaje = addMinutes(hi, -60);
+        if(montaje) lines.push('\uD83D\uDEE0\uFE0F Muntaia: ' + montaje + ' (1h antes)');
+      }
+      const lekua = getLekua(e);
+      if(lekua && lekua !== 'Por confirmar') lines.push('\uD83D\uDCCD Lekua: ' + lekua);
+      else if(e.location) lines.push('\uD83D\uDCCD Lekua: ' + e.location);
+      if(anims) lines.push('\uD83D\uDC64 Animatzailea: ' + anims);
+      if(djs)   lines.push('\uD83C\uDFA7 DJ: ' + djs);
+      if(persona) {
+        const p = getPrecio(e, persona);
+        if(p) {
+          if(p.rango) lines.push('\uD83D\uDCB6 Prezioa: ' + p.precioMin + '\u2013' + p.precioMax + '\u20AC (' + formatTarifa(p.tarifaKey) + ', prov.?)');
+          else        lines.push('\uD83D\uDCB6 Prezioa: ' + p.precio + '\u20AC (' + formatTarifa(p.tarifaKey) + (p.provincia?(', '+p.provincia):'') + ')');
+        }
+      }
+      lines.push('\uD83D\uDE90 Furgoneta: ' + getAparkatzeko(e));
+      lines.push('\uD83D\uDCDE Kontaktua: ' + getKontaktua(e));
+      const notasLimpias = e.notas ? e.notas.replace(/\[Original:.*?\]/g,'').replace(/Ubicacion:[^|]*/g,'').replace(/\|\s*\|/g,'|').replace(/^\s*\|\s*|\s*\|\s*$/g,'').trim() : '';
+      if(notasLimpias) lines.push('\uD83D\uDCDD Oharrak: ' + notasLimpias);
+    } else {
+      let line = '\uD83D\uDCC5 ' + formatFechaCorta(e.fecha) + ' ' + (e.hora_inicio||'') + ' \uD83C\uDFF8\uFE0F ' + (e.pueblo||'');
+      if(anims) line += ' \uD83D\uDC64 ' + anims;
+      if(djs)   line += ' \uD83C\uDFA7 ' + djs;
+      lines.push(line);
+    }
   });
 
   const msg = lines.join('\n');
