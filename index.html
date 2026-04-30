@@ -854,8 +854,6 @@ async function buildMsgDetallado() {
       }
     }
     lines.push('\uD83D\uDCDE Kontaktua: ' + getKontaktua(e));
-    const notasLimpias = e.notas ? e.notas.replace(/\[Original:.*?\]/g,'').replace(/Ubicacion:[^|]*/g,'').replace(/\|\s*\|/g,'|').replace(/^\s*\|\s*|\s*\|\s*$/g,'').trim() : '';
-    if(notasLimpias) lines.push('\uD83D\uDCDD Oharrak: ' + notasLimpias);
   });
   return lines.join('\n');
 }
@@ -1141,3 +1139,4 @@ document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
+                                                                                                                                                                                                                                                            
