@@ -2,8 +2,9 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#6a1b9a">
+<meta name="description" content="Agenda de Diskofestas de Arima Cool Tour: consulta, filtra y comparte por WhatsApp.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Diskofestas">
@@ -13,1124 +14,1425 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%236a1b9a'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle'%3E%F0%9F%8E%89%3C/text%3E%3C/svg%3E">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='70' font-size='70' text-anchor='middle'%3E%F0%9F%8E%89%3C/text%3E%3C/svg%3E">
 <style>
+  :root {
+    --morado: #6a1b9a;
+    --morado-claro: #9c27b0;
+    --rosa: #e91e63;
+    --borde: #e0d4eb;
+    --lila-suave: #f3e8ff;
+    --lila-fondo: #faf7fc;
+    --texto: #1a1a1a;
+    --texto-suave: #5a5a5a;
+    --ambar: #ffb300;
+    --rojo: #d32f2f;
+    --rojo-fondo: #ffebee;
+    --wa: #25D366;
+    --header-h: 62px;
+    --radio: 14px;
+    --sombra: 0 1px 6px rgba(0,0,0,0.06);
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     background: linear-gradient(180deg, #faf5ff 0%, #f3e8ff 100%);
-    color: #1a1a1a;
+    background-attachment: fixed;
+    color: var(--texto);
     font-size: 15px;
     line-height: 1.45;
     min-height: 100vh;
-    padding-bottom: 90px;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
   }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+  /* Foco visible y consistente en todos los controles */
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+    outline: 3px solid #7b1fa2; outline-offset: 2px; border-radius: 8px;
+  }
+  .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+
+  /* ===== Cabecera ===== */
   header {
-    position: sticky; top: 0; z-index: 50;
+    position: sticky; top: 0; z-index: 60;
     background: linear-gradient(135deg, #6a1b9a 0%, #9c27b0 60%, #e91e63 100%);
-    color: #fff; padding: 14px 16px 12px;
+    color: #fff; padding: 12px 16px 10px;
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
     box-shadow: 0 2px 8px rgba(106,27,154,0.25);
   }
-  header h1 { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-  header .subtitle { font-size: 12px; opacity: 0.9; margin-top: 2px; }
-  header .badge { display: inline-block; background: rgba(255,255,255,0.22); padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: 6px; }
-  .filters { background: #fff; margin: 12px; border-radius: 14px; padding: 14px 14px 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
-  .filters-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-  .filters-header h2 { font-size: 14px; font-weight: 600; color: #6a1b9a; text-transform: uppercase; letter-spacing: 0.5px; }
-  .filters-header button.toggle { background: none; border: none; font-size: 18px; color: #6a1b9a; cursor: pointer; padding: 4px 8px; }
-  .filters-body { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  header .top-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  header h1 { font-size: 19px; font-weight: 700; display: flex; align-items: center; gap: 7px; }
+  header .badge { background: rgba(255,255,255,0.22); padding: 3px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  header .subtitle { font-size: 12px; opacity: 0.92; margin-top: 3px; }
+
+  /* ===== Buscador global (siempre visible) ===== */
+  .searchbar { padding: 10px 12px 0; }
+  .searchbar .wrap { position: relative; display: flex; align-items: center; }
+  .searchbar .ico { position: absolute; left: 12px; font-size: 15px; opacity: 0.6; pointer-events: none; }
+  .searchbar input {
+    width: 100%; border: 1.5px solid var(--borde); border-radius: 12px;
+    padding: 12px 42px 12px 36px; font-size: 16px; background: #fff; color: var(--texto);
+    font-family: inherit; box-shadow: var(--sombra);
+  }
+  .searchbar input:focus { border-color: var(--morado-claro); outline: none; box-shadow: 0 0 0 3px rgba(156,39,176,0.15); }
+  .searchbar .clear {
+    position: absolute; right: 6px; width: 32px; height: 32px; border: none; background: transparent;
+    color: #999; font-size: 20px; line-height: 1; cursor: pointer; border-radius: 50%; display: none;
+  }
+  .searchbar .clear.visible { display: block; }
+
+  /* ===== Chips de filtros activos ===== */
+  .active-filters { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px 0; }
+  .active-filters:empty { display: none; }
+  .af-chip {
+    display: inline-flex; align-items: center; gap: 6px; background: #fff; color: var(--morado);
+    border: 1.5px solid var(--morado-claro); border-radius: 16px; padding: 5px 6px 5px 11px;
+    font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; min-height: 32px;
+  }
+  .af-chip .x { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: var(--lila-suave); font-size: 14px; line-height: 1; }
+  .af-chip.clear-all { background: var(--morado); color: #fff; border-color: var(--morado); padding: 5px 12px; }
+
+  /* ===== Panel de filtros ===== */
+  .filters { background: #fff; margin: 10px 12px 0; border-radius: var(--radio); padding: 12px 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+  .filters-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .filters-header h2 { font-size: 13px; font-weight: 700; color: var(--morado); text-transform: uppercase; letter-spacing: 0.5px; }
+  .filters-header .toggle {
+    background: var(--lila-suave); border: none; color: var(--morado); font-size: 13px; font-weight: 700;
+    cursor: pointer; padding: 8px 12px; border-radius: 10px; min-height: 36px; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .filters-body { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
   .filters-body.collapsed { display: none; }
-  .field { display: flex; flex-direction: column; }
+  .field { display: flex; flex-direction: column; min-width: 0; }
   .field.full { grid-column: 1 / -1; }
-  .field label { font-size: 11px; font-weight: 600; color: #555; margin-bottom: 4px; text-transform: uppercase; }
-  .field select, .field input { border: 1.5px solid #e0d4eb; border-radius: 10px; padding: 9px 10px; font-size: 14px; background: #faf7fc; color: #1a1a1a; font-family: inherit; width: 100%; transition: border 0.15s; }
-  .field select:focus, .field input:focus { outline: none; border-color: #9c27b0; background: #fff; }
-  .filter-actions { display: flex; gap: 8px; margin-top: 10px; }
-  .btn { flex: 1; border: none; padding: 11px 14px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; transition: transform 0.1s, opacity 0.15s; }
-  .btn:active { transform: scale(0.97); }
-  .btn-primary { background: linear-gradient(135deg, #6a1b9a, #9c27b0); color: #fff; }
-  .btn-ghost { background: #f0e7f7; color: #6a1b9a; }
-  .count-bar { display: flex; align-items: center; justify-content: space-between; padding: 0 20px 10px; font-size: 13px; color: #6a1b9a; font-weight: 600; }
-  .count-bar .count-num { background: #6a1b9a; color: #fff; padding: 3px 10px; border-radius: 12px; font-weight: 700; }
+  .field label { font-size: 11px; font-weight: 700; color: var(--texto-suave); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .field select, .field input {
+    border: 1.5px solid var(--borde); border-radius: 10px; padding: 11px 10px; font-size: 16px;
+    background: var(--lila-fondo); color: var(--texto); font-family: inherit; width: 100%;
+    min-height: 44px; transition: border-color 0.15s, background 0.15s;
+  }
+  .field select:focus, .field input:focus { outline: none; border-color: var(--morado-claro); background: #fff; }
+  .filter-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .btn { flex: 1; border: none; padding: 12px 14px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; min-height: 44px; transition: transform 0.1s; }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: linear-gradient(135deg, var(--morado), var(--morado-claro)); color: #fff; }
+  .btn-ghost { background: var(--lila-suave); color: var(--morado); }
+
+  /* Atajos de fecha */
+  .date-shortcuts { display: flex; flex-wrap: wrap; gap: 6px; }
+  .date-chip {
+    background: var(--lila-suave); color: var(--morado); border: 1.5px solid var(--borde);
+    border-radius: 16px; padding: 8px 13px; font-size: 13px; font-weight: 600; cursor: pointer;
+    font-family: inherit; min-height: 38px; transition: background 0.15s, color 0.15s;
+  }
+  .date-chip.active { background: var(--morado); color: #fff; border-color: var(--morado); }
+  .date-chip.warn { background: var(--rojo-fondo); color: var(--rojo); border-color: #ffcdd2; }
+  .date-chip.warn.active { background: var(--rojo); color: #fff; border-color: var(--rojo); }
+
+  /* Interruptores */
+  .toggle-row { display: flex; align-items: center; gap: 10px; padding: 4px 0; min-height: 44px; cursor: pointer; }
+  .toggle-row .tl { font-size: 14px; color: var(--texto-suave); user-select: none; flex: 1; }
+  .toggle-switch { position: relative; width: 44px; height: 26px; background: #d5d5d5; border: none; border-radius: 13px; transition: background 0.2s; cursor: pointer; flex-shrink: 0; }
+  .toggle-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; background: #fff; border-radius: 50%; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
+  .toggle-switch[aria-checked="true"] { background: var(--morado-claro); }
+  .toggle-switch[aria-checked="true"]::after { transform: translateX(18px); }
+
+  /* ===== Barra de resultados ===== */
+  .count-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 20px 8px; font-size: 13px; color: var(--morado); font-weight: 700; }
+  .count-bar .count-num { background: var(--morado); color: #fff; padding: 4px 11px; border-radius: 12px; font-weight: 800; }
+  .warn-bar {
+    display: none; align-items: center; gap: 10px; margin: 0 12px 4px; padding: 11px 14px;
+    background: var(--rojo-fondo); border: 1px solid #ffcdd2; border-radius: 12px; font-size: 13px; color: #b71c1c;
+  }
+  .warn-bar.visible { display: flex; }
+  .warn-bar span { flex: 1; line-height: 1.35; }
+  .warn-bar button { background: var(--rojo); border: none; color: #fff; font-weight: 700; padding: 8px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: inherit; white-space: nowrap; min-height: 36px; }
+
+  .precio-total { margin: 4px 12px 6px; padding: 12px 14px; background: linear-gradient(135deg,#fff8e1,#ffe082); border-radius: 12px; display: none; align-items: center; justify-content: space-between; gap: 10px; box-shadow: 0 1px 6px rgba(255,193,7,0.25); }
+  .precio-total.visible { display: flex; }
+  .precio-total .label { font-size: 13px; font-weight: 700; color: #7a5a00; }
+  .precio-total .valor { font-size: 19px; font-weight: 800; color: #5a4000; white-space: nowrap; }
+  .precio-total .subnote { font-size: 11px; color: #7a5a00; opacity: 0.9; }
+
+  /* ===== Tarjetas ===== */
   .results { padding: 0 12px; }
-  .event-card { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px; box-shadow: 0 1px 6px rgba(0,0,0,0.05); border-left: 4px solid #9c27b0; position: relative; }
-  .event-card .date-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
-  .event-card .fecha { font-size: 15px; font-weight: 700; color: #6a1b9a; }
-  .event-card .hora { font-size: 13px; color: #555; font-weight: 600; }
-  .event-card .pueblo { font-size: 17px; font-weight: 700; color: #1a1a1a; margin-bottom: 6px; }
-  .event-card .people { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-  .chip { display: inline-block; background: #f3e8ff; color: #6a1b9a; padding: 3px 10px; border-radius: 10px; font-size: 12px; font-weight: 500; }
+  .month-header {
+    position: sticky; top: var(--header-h); z-index: 30;
+    background: linear-gradient(135deg, var(--morado), var(--morado-claro)); color: #fff;
+    padding: 9px 16px; margin: 14px 0 8px; border-radius: 10px; font-size: 13px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(106,27,154,0.25);
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .month-header .mh-count { background: rgba(255,255,255,0.25); padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .event-card {
+    background: #fff; border-radius: var(--radio); padding: 13px 14px; margin-bottom: 10px;
+    box-shadow: var(--sombra); border-left: 4px solid var(--morado-claro); position: relative;
+  }
+  .event-card.upcoming { border-left-color: var(--ambar); box-shadow: 0 2px 10px rgba(255,179,0,0.2); }
+  .event-card.sin-animador { border-left-color: var(--rojo); background: #fffafa; }
+  .event-card.past { opacity: 0.72; border-left-color: #bdbdbd; }
+  .event-card .date-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+  .event-card .fecha { font-size: 15px; font-weight: 700; color: var(--morado); }
+  .event-card .hora { font-size: 13px; color: var(--texto-suave); font-weight: 600; white-space: nowrap; }
+  .event-card .pueblo { font-size: 17px; font-weight: 700; color: var(--texto); margin-bottom: 7px; }
+  .event-card .people { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { display: inline-flex; align-items: center; max-width: 100%; background: var(--lila-suave); color: var(--morado); padding: 4px 10px; border-radius: 10px; font-size: 12px; font-weight: 600; }
   .chip.dj { background: #ffe0e8; color: #c2185b; }
-  .chip.lugar { background: #e8f5e9; color: #2e7d32; }
-  .chip.precio { background: #fff3cd; color: #856404; border: 1px solid #ffe08a; font-weight:700; }
-  .chip.precio.noprov { background: #f5f5f5; color: #555; border:1px dashed #bbb; }
-  .precio-total { margin: 4px 12px 10px; padding: 12px 14px; background: linear-gradient(135deg,#fff8e1,#ffe082); border-radius: 12px; display:flex; align-items:center; justify-content:space-between; box-shadow: 0 1px 6px rgba(255,193,7,0.25); }
-  .precio-total .label { font-size: 13px; font-weight: 600; color: #7a5a00; }
-  .precio-total .valor { font-size: 18px; font-weight: 800; color: #5a4000; }
-  .precio-total .subnote { font-size: 11px; color: #7a5a00; opacity:0.85; }
-  .event-card .notas { font-size: 12px; color: #777; line-height: 1.4; font-style: italic; border-top: 1px solid #f0e7f7; padding-top: 6px; margin-top: 6px; display: none; }
-  .event-card.expanded .notas { display: block; }
-  .notas-visible { font-size: 12px; color: #666; line-height: 1.45; font-style: italic; border-top: 1px solid #f0e7f7; padding-top: 6px; margin-top: 6px; }
-  .event-card .expand-hint { font-size: 11px; color: #9c27b0; cursor: pointer; user-select: none; }
-  .empty { text-align: center; padding: 50px 20px; color: #888; }
-  .empty .icon { font-size: 56px; opacity: 0.5; }
-  .fab-share { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #25D366; color: #fff; padding: 14px 24px; border-radius: 30px; font-size: 15px; font-weight: 700; border: none; cursor: pointer; box-shadow: 0 4px 16px rgba(37,211,102,0.4); display: flex; align-items: center; gap: 8px; font-family: inherit; z-index: 100; transition: transform 0.15s; }
-  .fab-share:active { transform: translateX(-50%) scale(0.95); }
-  .fab-share svg { width: 20px; height: 20px; }
-  .refresh-notice { font-size: 11px; color: #999; text-align: center; padding: 20px 16px 10px; line-height: 1.5; }
-  .install-banner { display:none; background: linear-gradient(135deg,#6a1b9a,#9c27b0); color:#fff; margin:0 12px 0; border-radius:14px; padding:12px 14px; font-size:13px; align-items:center; gap:10px; }
-  .install-banner.visible { display:flex; }
-  .install-banner span { flex:1; line-height:1.4; }
-  .install-banner button { background:rgba(255,255,255,0.25); border:none; color:#fff; font-weight:700; padding:7px 14px; border-radius:10px; font-size:13px; cursor:pointer; white-space:nowrap; font-family:inherit; }
-  .update-bar { display:none; background:#fff3cd; border:1px solid #ffc107; margin:8px 12px 0; border-radius:10px; padding:10px 14px; font-size:13px; color:#856404; align-items:center; gap:8px; }
-  .update-bar.visible { display:flex; }
-  .update-bar span { flex:1; }
-  .update-bar button { background:#ffc107; border:none; color:#212529; font-weight:700; padding:6px 12px; border-radius:8px; font-size:12px; cursor:pointer; font-family:inherit; }
+  .chip.lugar { background: #e8f5e9; color: #2e7d32; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; min-height: 30px; }
+  .chip.precio { background: #fff3cd; color: #856404; border: 1px solid #ffe08a; font-weight: 700; }
+  .chip.precio.noprov { background: #f5f5f5; color: #555; border: 1px dashed #bbb; }
+  .chip.upcoming { background: linear-gradient(135deg,#ffe082,#ffb300); color: #5a4000; font-weight: 700; border: 1px solid var(--ambar); }
+  .chip.alerta { background: var(--rojo-fondo); color: var(--rojo); font-weight: 700; border: 1px solid #ffcdd2; }
+  .chip.pasado { background: #eee; color: #666; }
+  .event-card .notas-visible { font-size: 12.5px; color: #666; line-height: 1.45; font-style: italic; border-top: 1px solid var(--lila-suave); padding-top: 7px; margin-top: 9px; }
+  .event-card .detalles { display: none; border-top: 1px solid var(--lila-suave); margin-top: 9px; padding-top: 8px; font-size: 13px; color: var(--texto-suave); }
+  .event-card.expanded .detalles { display: block; }
+  .event-card .detalles div { margin-bottom: 3px; }
+  .event-card .expand-btn {
+    display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%;
+    margin-top: 9px; background: var(--lila-fondo); border: 1px solid var(--borde); color: var(--morado);
+    border-radius: 9px; padding: 8px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; min-height: 38px;
+  }
+  .event-card.expanded .expand-btn .caret { transform: rotate(180deg); }
+  .expand-btn .caret { display: inline-block; transition: transform 0.18s; }
+
+  /* ===== Estado vacío ===== */
+  .empty { text-align: center; padding: 40px 20px 30px; color: #888; }
+  .empty .icon { font-size: 52px; opacity: 0.55; }
+  .empty h3 { font-size: 16px; color: var(--texto); margin: 10px 0 6px; }
+  .empty p { font-size: 13.5px; line-height: 1.5; max-width: 340px; margin: 0 auto 14px; }
+  .empty .acciones { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .empty .acciones button { background: var(--morado); color: #fff; border: none; border-radius: 10px; padding: 11px 16px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; min-height: 44px; }
+  .empty .acciones button.sec { background: var(--lila-suave); color: var(--morado); }
+
+  /* ===== Pie y botones flotantes ===== */
+  .refresh-notice { font-size: 11px; color: #999; text-align: center; padding: 22px 16px 10px; line-height: 1.6; }
+  .install-banner { display: none; background: linear-gradient(135deg,var(--morado),var(--morado-claro)); color: #fff; margin: 10px 12px 0; border-radius: var(--radio); padding: 12px 14px; font-size: 13px; align-items: center; gap: 10px; }
+  .install-banner.visible { display: flex; }
+  .install-banner span { flex: 1; line-height: 1.4; }
+  .install-banner button { background: rgba(255,255,255,0.25); border: none; color: #fff; font-weight: 700; padding: 9px 14px; border-radius: 10px; font-size: 13px; cursor: pointer; white-space: nowrap; font-family: inherit; min-height: 40px; }
+  .fab-share {
+    position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    background: var(--wa); color: #fff; padding: 14px 22px; border-radius: 30px; font-size: 15px; font-weight: 700;
+    border: none; cursor: pointer; box-shadow: 0 4px 16px rgba(37,211,102,0.45); display: flex; align-items: center; gap: 8px;
+    font-family: inherit; z-index: 100; min-height: 52px; transition: transform 0.15s, opacity 0.15s;
+  }
+  .fab-share:active { transform: translateX(-50%) scale(0.96); }
+  .fab-share[disabled] { background: #b8b8b8; box-shadow: none; cursor: not-allowed; }
+  .fab-share svg { width: 20px; height: 20px; flex-shrink: 0; }
+  .to-top {
+    position: fixed; right: 14px; bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    width: 44px; height: 44px; border-radius: 50%; border: none; background: #fff; color: var(--morado);
+    font-size: 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.18); cursor: pointer; z-index: 99;
+    display: none; align-items: center; justify-content: center;
+  }
+  .to-top.visible { display: flex; }
+
+  /* ===== Modal ===== */
+  .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-end; justify-content: center; }
+  .modal-backdrop.visible { display: flex; }
+  .modal-card {
+    background: #fff; width: 100%; max-width: 480px; max-height: 92vh; overflow-y: auto;
+    border-radius: 18px 18px 0 0; padding: 18px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -6px 22px rgba(0,0,0,0.25); animation: slideUp 0.22s ease-out;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-card h3 { font-size: 17px; font-weight: 700; color: var(--morado); margin-bottom: 4px; }
+  .modal-card .sub { font-size: 12.5px; color: #777; margin-bottom: 14px; }
+  .mode-btn { display: flex; align-items: flex-start; gap: 12px; width: 100%; background: var(--lila-fondo); border: 1.5px solid var(--borde); border-radius: 12px; padding: 13px 14px; margin-bottom: 8px; cursor: pointer; font-family: inherit; text-align: left; min-height: 56px; }
+  .mode-btn:active { background: var(--lila-suave); border-color: var(--morado-claro); }
+  .mode-btn .mode-icon { font-size: 22px; line-height: 1.2; flex-shrink: 0; }
+  .mode-btn .mode-title { font-size: 14.5px; font-weight: 700; color: var(--texto); margin-bottom: 2px; }
+  .mode-btn .mode-desc { font-size: 11.5px; color: #666; line-height: 1.4; }
+  .modal-cancel { width: 100%; background: var(--lila-suave); color: var(--morado); border: none; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700; margin-top: 6px; cursor: pointer; font-family: inherit; min-height: 46px; }
+  .modal-card .loading { text-align: center; padding: 24px 14px; color: var(--morado); font-size: 13px; }
+  .modal-card .loading .spin { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--borde); border-top-color: var(--morado-claro); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .preview-box {
+    background: var(--lila-fondo); border: 1.5px solid var(--borde); border-radius: 12px;
+    padding: 12px; font-size: 12.5px; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+    max-height: 38vh; overflow-y: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; margin-bottom: 10px;
+  }
+  .preview-actions { display: flex; gap: 8px; }
+  .preview-actions button { flex: 1; border: none; border-radius: 10px; padding: 13px 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; min-height: 48px; }
+  .btn-wa { background: var(--wa); color: #fff; }
+  .btn-copy { background: var(--lila-suave); color: var(--morado); }
+  .btn-copy.ok { background: #c8e6c9; color: #1b5e20; }
+  .aviso-largo { background: #fff3cd; border: 1px solid #ffe08a; color: #856404; border-radius: 10px; padding: 10px 12px; font-size: 12px; line-height: 1.45; margin-bottom: 10px; }
+  .toast {
+    position: fixed; left: 50%; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+    background: #262626; color: #fff; padding: 11px 18px; border-radius: 22px; font-size: 13.5px; font-weight: 600;
+    z-index: 300; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; max-width: 88vw; text-align: center;
+  }
+  .toast.visible { opacity: 1; transform: translateX(-50%) translateY(-6px); }
+
   @media (min-width: 640px) {
     .filters-body { grid-template-columns: 1fr 1fr 1fr; }
-    .results, .filters, .count-bar, .month-header { max-width: 720px; margin-left: auto; margin-right: auto; }
+    .results, .filters, .count-bar, .searchbar, .active-filters, .precio-total, .warn-bar, .install-banner { max-width: 720px; margin-left: auto; margin-right: auto; }
   }
-  /* ===== Atajos de fecha (F1) ===== */
-  .date-shortcuts { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
-  .date-chip { background:#f0e7f7; color:#6a1b9a; border:1px solid #e0d4eb; border-radius:14px; padding:5px 11px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; transition:all 0.15s; }
-  .date-chip:hover, .date-chip.active { background:#6a1b9a; color:#fff; border-color:#6a1b9a; }
-  /* (Multiselect chips retirados — animador/DJ son ahora inputs con datalist) */
-  /* ===== Toggle Ver pasados (F3) ===== */
-  .toggle-row { display:flex; align-items:center; gap:8px; margin-top:6px; padding:6px 4px; }
-  .toggle-row label { font-size:13px; color:#555; cursor:pointer; user-select:none; flex:1; }
-  .toggle-switch { position:relative; width:38px; height:22px; background:#ddd; border-radius:12px; transition:background 0.2s; cursor:pointer; flex-shrink:0; }
-  .toggle-switch::after { content:''; position:absolute; top:2px; left:2px; width:18px; height:18px; background:#fff; border-radius:50%; transition:transform 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
-  .toggle-switch.on { background:#9c27b0; }
-  .toggle-switch.on::after { transform:translateX(16px); }
-  /* ===== Mes pegajoso (V3 + D3) ===== */
-  .month-header { position:sticky; top:60px; z-index:30; background:linear-gradient(135deg,#6a1b9a,#9c27b0); color:#fff; padding:8px 16px; margin:14px 12px 8px; border-radius:10px; font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; box-shadow:0 2px 8px rgba(106,27,154,0.25); display:flex; align-items:center; justify-content:space-between; }
-  .month-header .mh-count { background:rgba(255,255,255,0.25); padding:2px 9px; border-radius:10px; font-size:11px; font-weight:600; }
-  /* ===== Esta semana (D2) ===== */
-  .event-card.upcoming { border-left:4px solid #ffb300; box-shadow:0 2px 10px rgba(255,179,0,0.18); }
-  .chip.upcoming { background:linear-gradient(135deg,#ffe082,#ffb300); color:#5a4000; font-weight:700; border:1px solid #ffb300; }
-  /* ===== Ordenar por (V2) ===== */
-  .sort-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
-  .sort-row label { font-size:11px; font-weight:600; color:#555; text-transform:uppercase; }
-  .sort-row select { flex:1; border:1.5px solid #e0d4eb; border-radius:10px; padding:7px 8px; font-size:13px; background:#faf7fc; color:#1a1a1a; font-family:inherit; }
-  /* ===== Modal compartir (W1) ===== */
-  .modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200; align-items:flex-end; justify-content:center; }
-  .modal-backdrop.visible { display:flex; }
-  .modal-card { background:#fff; width:100%; max-width:480px; border-radius:18px 18px 0 0; padding:18px 16px 28px; box-shadow:0 -6px 22px rgba(0,0,0,0.25); animation:slideUp 0.22s ease-out; }
-  @keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
-  .modal-card h3 { font-size:16px; font-weight:700; color:#6a1b9a; margin-bottom:4px; }
-  .modal-card .sub { font-size:12px; color:#777; margin-bottom:14px; }
-  .mode-btn { display:flex; align-items:flex-start; gap:12px; width:100%; background:#faf7fc; border:1.5px solid #e0d4eb; border-radius:12px; padding:12px 14px; margin-bottom:8px; cursor:pointer; font-family:inherit; text-align:left; transition:all 0.12s; }
-  .mode-btn:hover, .mode-btn:active { background:#f3e8ff; border-color:#9c27b0; }
-  .mode-btn .mode-icon { font-size:22px; line-height:1; flex-shrink:0; }
-  .mode-btn .mode-title { font-size:14px; font-weight:700; color:#1a1a1a; margin-bottom:2px; }
-  .mode-btn .mode-desc { font-size:11px; color:#666; line-height:1.35; }
-  .modal-card .modal-cancel { width:100%; background:#f0e7f7; color:#6a1b9a; border:none; padding:11px; border-radius:10px; font-size:14px; font-weight:600; margin-top:6px; cursor:pointer; font-family:inherit; }
-  .modal-card .loading { text-align:center; padding:14px; color:#6a1b9a; font-size:13px; }
-  .modal-card .loading .spin { display:inline-block; width:18px; height:18px; border:2px solid #e0d4eb; border-top-color:#9c27b0; border-radius:50%; animation:spin 0.7s linear infinite; vertical-align:middle; margin-right:8px; }
-  @keyframes spin { to { transform:rotate(360deg); } }
 </style>
 </head>
 <body>
-<header>
-  <h1>&#x1F389; Diskofestas <span class="badge" id="fechaHoy"></span></h1>
-  <div class="subtitle">Arima Cool Tour — <span id="totalEvents">0</span> eventos</div>
+<header id="appHeader">
+  <div class="top-row">
+    <h1>&#x1F389; Diskofestas</h1>
+    <span class="badge" id="fechaHoy"></span>
+  </div>
+  <div class="subtitle">Arima Cool Tour &mdash; <span id="totalEvents">0</span> diskos pr&oacute;ximas de <span id="totalAll">0</span> registradas</div>
 </header>
+
 <div class="install-banner" id="installBanner">
-  <span>&#x1F4F2; <b>Instala la app</b> en tu móvil para acceso rápido desde la pantalla de inicio.</span>
-  <button id="btnInstall">Instalar</button>
+  <span>&#x1F4F2; <b>Instala la app</b> en tu m&oacute;vil para acceso r&aacute;pido desde la pantalla de inicio.</span>
+  <button type="button" id="btnInstall">Instalar</button>
 </div>
-<div class="update-bar" id="updateBar">
-  <span>&#x1F504; Hay datos nuevos disponibles.</span>
-  <button onclick="location.reload()">Actualizar</button>
+
+<div class="searchbar">
+  <div class="wrap">
+    <span class="ico" aria-hidden="true">&#x1F50D;</span>
+    <label class="sr-only" for="fBuscar">Buscar en todas las diskos</label>
+    <input type="search" id="fBuscar" placeholder="Buscar pueblo, animador, DJ, notas&hellip;" autocomplete="off" enterkeyhint="search">
+    <button type="button" class="clear" id="btnClearSearch" aria-label="Borrar b&uacute;squeda">&#x2715;</button>
+  </div>
 </div>
-<section class="filters">
+
+<div class="active-filters" id="activeFilters"></div>
+
+<section class="filters" aria-labelledby="filtrosTitulo">
   <div class="filters-header">
-    <h2>&#x1F50D; Filtros</h2>
-    <button class="toggle" id="btnToggleFilters" aria-label="Plegar filtros" onclick="toggleFiltros(this)">▲</button>
+    <h2 id="filtrosTitulo">&#x1F39B;&#xFE0F; Filtros</h2>
+    <button type="button" class="toggle" id="btnToggleFilters" aria-expanded="true" aria-controls="filtersBody">
+      <span id="toggleTxt">Ocultar</span><span class="caret" aria-hidden="true">&#x25B2;</span>
+    </button>
   </div>
   <div class="filters-body" id="filtersBody">
-    <div class="field"><label for="fAnimador">Animador</label><input type="text" id="fAnimador" list="dlAnimador" placeholder="Buscar animador..." autocomplete="off" oninput="applyFilters()"><datalist id="dlAnimador"></datalist></div>
-    <div class="field"><label for="fDJ">DJ</label><input type="text" id="fDJ" list="dlDJ" placeholder="Buscar DJ..." autocomplete="off" oninput="applyFilters()"><datalist id="dlDJ"></datalist></div>
-    <div class="field"><label for="fPueblo">Bezeroa</label><select id="fPueblo" onchange="applyFilters()"><option value="">Todos</option></select></div>
-    <div class="field"><label for="fTexto">Texto libre</label><input type="text" id="fTexto" placeholder="Buscar en notas..." oninput="applyFilters()"></div>
-    <div class="field"><label for="fDesde">Desde</label><input type="date" id="fDesde" onchange="applyFilters()"></div>
-    <div class="field"><label for="fHasta">Hasta</label><input type="date" id="fHasta" onchange="applyFilters()"></div>
     <div class="field full">
-      <div class="date-shortcuts" id="dateShortcuts">
+      <label id="lblAtajos">Rango r&aacute;pido</label>
+      <div class="date-shortcuts" id="dateShortcuts" role="group" aria-labelledby="lblAtajos">
         <button type="button" class="date-chip" data-shortcut="hoy">Hoy</button>
-        <button type="button" class="date-chip" data-shortcut="finde">Próx. finde</button>
+        <button type="button" class="date-chip" data-shortcut="finde">Pr&oacute;x. finde</button>
         <button type="button" class="date-chip" data-shortcut="mes">Este mes</button>
-        <button type="button" class="date-chip" data-shortcut="d30">30 días</button>
+        <button type="button" class="date-chip" data-shortcut="d30">30 d&iacute;as</button>
         <button type="button" class="date-chip" data-shortcut="m3">3 meses</button>
+        <button type="button" class="date-chip" data-shortcut="todo">Todo</button>
       </div>
     </div>
-    <div class="field full">
-      <div class="toggle-row">
-        <label for="tPasados">&#x23EA; Ver eventos pasados</label>
-        <div class="toggle-switch" id="tPasados" role="switch" aria-checked="false" tabindex="0"></div>
-      </div>
+    <div class="field"><label for="fDesde">Desde</label><input type="date" id="fDesde"></div>
+    <div class="field"><label for="fHasta">Hasta</label><input type="date" id="fHasta"></div>
+    <div class="field"><label for="fAnimador">Animador</label><input type="text" id="fAnimador" list="dlAnimador" placeholder="Todos" autocomplete="off"><datalist id="dlAnimador"></datalist></div>
+    <div class="field"><label for="fDJ">DJ</label><input type="text" id="fDJ" list="dlDJ" placeholder="Todos" autocomplete="off"><datalist id="dlDJ"></datalist></div>
+    <div class="field"><label for="fPueblo">Herria / Bezeroa</label><select id="fPueblo"><option value="">Todos</option></select></div>
+    <div class="field"><label for="fOrden">Ordenar por</label>
+      <select id="fOrden">
+        <option value="fecha">&#x1F4C5; Fecha (pr&oacute;ximos primero)</option>
+        <option value="fecha_desc">&#x1F4C5; Fecha (lejanos primero)</option>
+        <option value="animador">&#x1F464; Animador (A&rarr;Z)</option>
+        <option value="pueblo">&#x1F3D8;&#xFE0F; Pueblo (A&rarr;Z)</option>
+        <option value="dj">&#x1F3A7; DJ (A&rarr;Z)</option>
+      </select>
     </div>
     <div class="field full">
-      <div class="sort-row">
-        <label for="fOrden">Ordenar:</label>
-        <select id="fOrden" onchange="applyFilters()">
-          <option value="fecha">&#x1F4C5; Fecha (próximos primero)</option>
-          <option value="fecha_desc">&#x1F4C5; Fecha (lejanos primero)</option>
-          <option value="animador">&#x1F464; Animador (A→Z)</option>
-          <option value="pueblo">&#x1F3D8;&#xFE0F; Pueblo (A→Z)</option>
-          <option value="dj">&#x1F3A7; DJ (A→Z)</option>
-        </select>
+      <div class="toggle-row" id="rowSinAnim">
+        <span class="tl">&#x26A0;&#xFE0F; Solo diskos <b>sin animador</b> asignado</span>
+        <button type="button" class="toggle-switch" id="tSinAnim" role="switch" aria-checked="false" aria-label="Solo diskos sin animador"></button>
+      </div>
+      <div class="toggle-row" id="rowPasados">
+        <span class="tl">&#x23EA; Incluir diskos <b>ya pasadas</b></span>
+        <button type="button" class="toggle-switch" id="tPasados" role="switch" aria-checked="false" aria-label="Incluir diskos pasadas"></button>
       </div>
     </div>
   </div>
   <div class="filter-actions">
-    <button class="btn btn-ghost" id="btnLimpiar" onclick="limpiarFiltros()">Limpiar</button>
-    <button class="btn btn-primary" id="btnAplicar" onclick="applyFilters()">Aplicar</button>
+    <button type="button" class="btn btn-ghost" id="btnLimpiar">&#x21BA; Limpiar filtros</button>
   </div>
 </section>
-<div class="count-bar"><span>&#x1F4CB; Resultados</span><span class="count-num" id="resultCount">0</span></div>
-<div id="precioTotal" class="precio-total" style="display:none;">
+
+<div class="count-bar">
+  <span>&#x1F4CB; Resultados</span>
+  <span class="count-num" id="resultCount" aria-live="polite" aria-atomic="true">0</span>
+</div>
+
+<div class="warn-bar" id="warnSinAnim">
+  <span id="warnSinAnimTxt"></span>
+  <button type="button" id="btnVerSinAnim">Ver</button>
+</div>
+
+<div id="precioTotal" class="precio-total">
   <div>
     <div class="label">&#x1F4B6; Total <span id="pTPersona"></span></div>
     <div class="subnote" id="pTDetalle"></div>
   </div>
   <div class="valor" id="pTValor"></div>
 </div>
+
 <main class="results" id="results"></main>
+
 <div class="refresh-notice">
-  &#x1F4C5; Datos sincronizados desde Google Calendar de <b>arimacooltour@gmail.com</b><br>
-  Última actualización: <span id="lastUpdate"></span>.
+  &#x1F4C5; Datos sincronizados desde el Google Calendar de <b>arimacooltour@gmail.com</b><br>
+  &Uacute;ltima actualizaci&oacute;n: <span id="lastUpdate"></span>
 </div>
-<button class="fab-share" id="btnShare" onclick="openShareModal()">
-  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.52 3.45C18.24 1.17 15.24 0 12 0 5.37 0 0 5.37 0 12c0 2.11.55 4.16 1.6 5.97L0 24l6.25-1.64C8 23.45 9.99 24 12 24c6.63 0 12-5.37 12-12 0-3.21-1.26-6.23-3.48-8.55zm-8.52 18.4c-1.76 0-3.48-.47-4.97-1.36l-.36-.21-3.71.97.99-3.62-.23-.37A9.94 9.94 0 0 1 2 12c0-5.52 4.48-10 10-10 2.67 0 5.18 1.04 7.07 2.93A9.93 9.93 0 0 1 22 12c0 5.52-4.48 9.85-10 9.85zm5.45-7.44c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.88-.78-1.47-1.74-1.65-2.04-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.25-.59-.5-.5-.67-.51H8.7c-.17 0-.45.06-.69.3-.24.24-.91.89-.91 2.16 0 1.27.93 2.5 1.06 2.67.13.17 1.83 2.8 4.44 3.93.62.27 1.1.43 1.48.55.62.2 1.19.17 1.64.1.5-.07 1.54-.63 1.76-1.24.22-.62.22-1.14.16-1.25-.06-.11-.24-.17-.54-.32z"/></svg>
-  Compartir por WhatsApp
+
+<button type="button" class="to-top" id="btnToTop" aria-label="Volver arriba">&#x2191;</button>
+
+<button type="button" class="fab-share" id="btnShare">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.52 3.45C18.24 1.17 15.24 0 12 0 5.37 0 0 5.37 0 12c0 2.11.55 4.16 1.6 5.97L0 24l6.25-1.64C8 23.45 9.99 24 12 24c6.63 0 12-5.37 12-12 0-3.21-1.26-6.23-3.48-8.55zm-8.52 18.4c-1.76 0-3.48-.47-4.97-1.36l-.36-.21-3.71.97.99-3.62-.23-.37A9.94 9.94 0 0 1 2 12c0-5.52 4.48-10 10-10 2.67 0 5.18 1.04 7.07 2.93A9.93 9.93 0 0 1 22 12c0 5.52-4.48 9.85-10 9.85zm5.45-7.44c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.47-.88-.78-1.47-1.74-1.65-2.04-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.25-.59-.5-.5-.67-.51H8.7c-.17 0-.45.06-.69.3-.24.24-.91.89-.91 2.16 0 1.27.93 2.5 1.06 2.67.13.17 1.83 2.8 4.44 3.93.62.27 1.1.43 1.48.55.62.2 1.19.17 1.64.1.5-.07 1.54-.63 1.76-1.24.22-.62.22-1.14.16-1.25-.06-.11-.24-.17-.54-.32z"/></svg>
+  <span id="shareLabel">Compartir por WhatsApp</span>
 </button>
-<!-- Modal de selección de modo (W1) -->
-<div class="modal-backdrop" id="shareModal" onclick="if(event.target===this)closeShareModal()">
-  <div class="modal-card" id="shareModalCard">
-    <h3>&#x1F4E4; ¿Cómo quieres compartir?</h3>
-    <div class="sub" id="shareModalSub">Elige el formato del mensaje de WhatsApp.</div>
-    <button type="button" class="mode-btn" data-mode="detallado">
-      <span class="mode-icon">&#x1F4CB;</span>
-      <div><div class="mode-title">Detallado</div><div class="mode-desc">Toda la info de cada disko: lekua, ordutegia, animador, DJ, prezioa, kontaktua, oharrak.</div></div>
-    </button>
-    <button type="button" class="mode-btn" data-mode="bezeroa">
-      <span class="mode-icon">&#x1F91D;</span>
-      <div><div class="mode-title">Bezeroa (euskaraz)</div><div class="mode-desc">Bezeroari bidaltzeko: dena euskaraz, data urtea/hilabetea/eguna formatuan, diskofesta.eus marka.</div></div>
-    </button>
-    <button type="button" class="mode-btn" data-mode="compacto">
-      <span class="mode-icon">&#x1F4C4;</span>
-      <div><div class="mode-title">Compacto (por mes)</div><div class="mode-desc">Una línea por evento, agrupado por mes. Ideal para enviar agendas largas.</div></div>
-    </button>
-    <button type="button" class="mode-btn" data-mode="por_animador">
-      <span class="mode-icon">&#x1F464;</span>
-      <div><div class="mode-title">Agrupado por animador</div><div class="mode-desc">Listado donde cada animador tiene sus propias diskos en orden de fecha.</div></div>
-    </button>
-    <button type="button" class="modal-cancel" onclick="closeShareModal()">Cancelar</button>
-  </div>
+
+<div class="modal-backdrop" id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+  <div class="modal-card" id="shareModalCard"></div>
 </div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <script>
 // ===== DATOS =====
 const EVENTS_DATA = [{"fecha": "2020-01-02", "pueblo": "iolan", "hora_inicio": "19:00", "hora_final": "21:00", "animador": "Urtza + Rubén", "dj": "", "notas": "[Original: Disko iolan urtza+ruben]", "location": "", "titulo": "Disko iolan urtza+ruben"}, {"fecha": "2020-01-04", "pueblo": "Arima", "hora_inicio": "17:30", "hora_final": "19:30", "animador": "", "dj": "", "notas": "[Original: Sorgin Zapatuak Disko Arima + gabonetako izarrak]", "location": "", "titulo": "Sorgin Zapatuak Disko Arima + gabonetako izarrak"}, {"fecha": "2020-02-15", "pueblo": "Iolan elorrio", "hora_inicio": "19:30", "hora_final": "21:30", "animador": "Urtza + Urko", "dj": "", "notas": "[Original: Iolan disko elorrio lurdesko ama urtza + urko]", "location": "", "titulo": "Iolan disko elorrio lurdesko ama urtza + urko"}, {"fecha": "2020-02-21", "pueblo": "Gallarta iolan", "hora_inicio": "11:30", "hora_final": "13:00", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Gallarta a la mañana disko iolan naiara+urko estar a las 10:00 para montar]", "location": "", "titulo": "Gallarta a la mañana disko iolan naiara+urko estar a las 10:00 para montar"}, {"fecha": "2020-02-21", "pueblo": "Ortuella Iolan", "hora_inicio": "17:00", "hora_final": "21:00", "animador": "", "dj": "", "notas": "EVT-1495 | [Original: Ortuella hinchables + disko Iolan]", "location": "", "titulo": "Ortuella hinchables + disko Iolan"}, {"fecha": "2020-02-21", "pueblo": "Basozelai", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Rubén + Araitz", "dj": "", "notas": "[Original: Disko Basozelai ruben + araitz]", "location": "", "titulo": "Disko Basozelai ruben + araitz"}, {"fecha": "2020-02-21", "pueblo": "Berriz", "hora_inicio": "18:30", "hora_final": "20:30", "animador": "Urtza + Urko", "dj": "", "notas": "[Original: Berriz disko urtza +Urko]", "location": "", "titulo": "Berriz disko urtza +Urko"}, {"fecha": "2020-02-21", "pueblo": "Sope", "hora_inicio": "20:30", "hora_final": "21:30", "animador": "Naiara + Aitzi", "dj": "", "notas": "[Original: Sope Euskal disko Naiara + aitzi]", "location": "", "titulo": "Sope Euskal disko Naiara + aitzi"}, {"fecha": "2020-02-22", "pueblo": "Zumaia", "hora_inicio": "17:00", "hora_final": "20:00", "animador": "Naiara + Aitzi", "dj": "", "notas": "[Original: Zumaia disko + presentación Naiara + Aitzi]", "location": "", "titulo": "Zumaia disko + presentación Naiara + Aitzi"}, {"fecha": "2020-02-22", "pueblo": "Orduña", "hora_inicio": "17:00", "hora_final": "21:30", "animador": "Jon + Itzi", "dj": "", "notas": "[Original: Orduña desfile + disko (jon +itzi) (19:30-21:30)]", "location": "", "titulo": "Orduña desfile + disko (jon +itzi) (19:30-21:30)"}, {"fecha": "2020-02-22", "pueblo": "Zumaia", "hora_inicio": "22:30", "hora_final": "01:30", "animador": "Naiara + Aitzi", "dj": "", "notas": "[Original: Zumaia disko Naiara +Aitzi]", "location": "", "titulo": "Zumaia disko Naiara +Aitzi"}, {"fecha": "2020-02-23", "pueblo": "Sope", "hora_inicio": "18:00", "hora_final": "21:00", "animador": "Urtza + Urko", "dj": "", "notas": "[Original: Sope desfile + disko urko + urtza]", "location": "", "titulo": "Sope desfile + disko urko + urtza"}, {"fecha": "2020-02-24", "pueblo": "Ugao", "hora_inicio": "17:30", "hora_final": "19:30", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Ugao urko+naiara disko]", "location": "", "titulo": "Ugao urko+naiara disko"}, {"fecha": "2020-02-25", "pueblo": "Iolan elorrio", "hora_inicio": "10:30", "hora_final": "13:00", "animador": "Urtza + Urko", "dj": "", "notas": "[Original: Disko Iolan elorrio urtza +Urko]", "location": "", "titulo": "Disko Iolan elorrio urtza +Urko"}, {"fecha": "2020-02-25", "pueblo": "Abadiño adur", "hora_inicio": "15:00", "hora_final": "17:00", "animador": "Mitxel + Aitzi", "dj": "", "notas": "[Original: Abadiño mitxel + aitzi? Disko adur]", "location": "", "titulo": "Abadiño mitxel + aitzi? Disko adur"}, {"fecha": "2020-02-25", "pueblo": "Ermua", "hora_inicio": "16:00", "hora_final": "18:00", "animador": "Urko + Paco", "dj": "", "notas": "[Original: Disko paco Ermua urko]", "location": "", "titulo": "Disko paco Ermua urko"}, {"fecha": "2020-02-25", "pueblo": "eibar", "hora_inicio": "17:00", "hora_final": "20:00", "animador": "Urtza + Urko", "dj": "", "notas": "[Original: Disko eibar urko + urtza. Sonorizacion. Disko empieza a las 19:00]", "location": "", "titulo": "Disko eibar urko + urtza. Sonorizacion. Disko empieza a las 19:00"}, {"fecha": "2020-02-28", "pueblo": "Nocedal", "hora_inicio": "20:30", "hora_final": "23:30", "animador": "Urtza", "dj": "", "notas": "EVT-1508 | [Original: Disko Nocedal Urtza]", "location": "", "titulo": "Disko Nocedal Urtza"}, {"fecha": "2020-03-07", "pueblo": "lemoiz", "hora_inicio": "18:00", "hora_final": "21:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko + txoko urtza lemoiz]", "location": "", "titulo": "Disko + txoko urtza lemoiz"}, {"fecha": "2020-03-29", "pueblo": "Erandio", "hora_inicio": "17:00", "hora_final": "18:30", "animador": "Urtza", "dj": "", "notas": "EVT-1509 | [Original: Disko topagune Erandio Urtza]", "location": "", "titulo": "Disko topagune Erandio Urtza"}, {"fecha": "2020-05-30", "pueblo": "Carreras", "hora_inicio": "12:00", "hora_final": "13:30", "animador": "Urtza", "dj": "", "notas": "EVT-1510 | [Original: Disko Las Carreras Urtza]", "location": "", "titulo": "Disko Las Carreras Urtza"}, {"fecha": "2020-06-13", "pueblo": "Altzaga", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Altzaga urtza]", "location": "", "titulo": "Disko Altzaga urtza"}, {"fecha": "2020-06-13", "pueblo": "lateorro", "hora_inicio": "18:30", "hora_final": "20:30", "animador": "Naiara + Aitzi", "dj": "", "notas": "[Original: Disko lateorro aitzi + naiara]", "location": "", "titulo": "Disko lateorro aitzi + naiara"}, {"fecha": "2020-06-19", "pueblo": "Buenos aires", "hora_inicio": "09:00", "hora_final": "10:00", "animador": "", "dj": "", "notas": "[Original: Buenos aires disko + actividades? Horario?]", "location": "", "titulo": "Buenos aires disko + actividades? Horario?"}, {"fecha": "2020-06-19", "pueblo": "Adur abadiño", "hora_inicio": "21:00", "hora_final": "23:00", "animador": "Mitxel", "dj": "", "notas": "[Original: Adur abadiño disko mitxel]", "location": "", "titulo": "Adur abadiño disko mitxel"}, {"fecha": "2020-06-23", "pueblo": "iolan berango", "hora_inicio": "19:00", "hora_final": "20:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko iolan berango Urtza]", "location": "", "titulo": "Disko iolan berango Urtza"}, {"fecha": "2021-06-18", "pueblo": "", "hora_inicio": "10:00", "hora_final": "13:00", "animador": "Paco", "dj": "", "notas": "[Original: Paco disko maestro zubeldia]", "location": "", "titulo": "Paco disko maestro zubeldia"}, {"fecha": "2021-09-03", "pueblo": "Iolan muntsaratz", "hora_inicio": "18:00", "hora_final": "20:00", "animador": "", "dj": "", "notas": "[Original: Iolan disko muntsaratz]", "location": "", "titulo": "Iolan disko muntsaratz"}, {"fecha": "2021-10-31", "pueblo": "lemoiz txoko", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "", "dj": "", "notas": "[Original: diskofesta lemoiz (18:30-20:00) + txoko (20:00)]", "location": "", "titulo": "diskofesta lemoiz (18:30-20:00) + txoko (20:00)"}, {"fecha": "2021-12-03", "pueblo": "Zipiriñe Iolan", "hora_inicio": "09:30", "hora_final": "12:40", "animador": "Urtza + Urko", "dj": "", "notas": "[Original: Disko Zipiriñe (comision Iolan) URKO + Urtza]", "location": "", "titulo": "Disko Zipiriñe (comision Iolan) URKO + Urtza"}, {"fecha": "2021-12-03", "pueblo": "Urduña", "hora_inicio": "17:00", "hora_final": "18:30", "animador": "Rubén + Karol", "dj": "", "notas": "[Original: Disko Urduña a la tarde. Ruben + Karol]", "location": "", "titulo": "Disko Urduña a la tarde. Ruben + Karol"}, {"fecha": "2021-12-04", "pueblo": "Laudio", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Urko + Karol", "dj": "", "notas": "[Original: Disko Laudio Karol. ( a la tarde) Horario? URKO]", "location": "", "titulo": "Disko Laudio Karol. ( a la tarde) Horario? URKO"}, {"fecha": "2021-12-22", "pueblo": "iolan sope", "hora_inicio": "18:30", "hora_final": "21:00", "animador": "Urtza + Urko", "dj": "", "notas": "[Original: Disko iolan sope Urtza + Urko]", "location": "", "titulo": "Disko iolan sope Urtza + Urko"}, {"fecha": "2022-02-25", "pueblo": "Berriz", "hora_inicio": "18:00", "hora_final": "20:00", "animador": "Urko + Karol", "dj": "", "notas": "[Original: Disko Berriz (Probaleku) Karol + Urko ]", "location": "", "titulo": "Disko Berriz (Probaleku) Karol + Urko "}, {"fecha": "2022-02-26", "pueblo": "zumaia", "hora_inicio": "17:00", "hora_final": "20:00", "animador": "Urko + Karol", "dj": "", "notas": "[Original: Disko zumaia Karol + Urko Horario?]", "location": "", "titulo": "Disko zumaia Karol + Urko Horario?"}, {"fecha": "2022-02-28", "pueblo": "Gatika", "hora_inicio": "17:30", "hora_final": "19:30", "animador": "Urtza", "dj": "", "notas": "[Original: Diskorrika Gatika urtza ]", "location": "", "titulo": "Diskorrika Gatika urtza "}, {"fecha": "2022-03-01", "pueblo": "Ermua", "hora_inicio": "16:00", "hora_final": "17:00", "animador": "Urtza + Paco", "dj": "", "notas": "[Original: Disko Paco Ermua Urtza]", "location": "", "titulo": "Disko Paco Ermua Urtza"}, {"fecha": "2022-03-13", "pueblo": "Mungia", "hora_inicio": "12:00", "hora_final": "13:30", "animador": "Urtza", "dj": "", "notas": "[Original: Diskorrika Mungia Urtza ( es su cumple)]", "location": "", "titulo": "Diskorrika Mungia Urtza ( es su cumple)"}, {"fecha": "2022-03-18", "pueblo": "Sope", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Urtza + Urko", "dj": "", "notas": "[Original: Sope Diskorrika Urtza + Urko]", "location": "", "titulo": "Sope Diskorrika Urtza + Urko"}, {"fecha": "2022-03-26", "pueblo": "ortuella", "hora_inicio": "13:00", "hora_final": "14:30", "animador": "Urtza", "dj": "", "notas": "[Original: Diskorrika ortuella urtza]", "location": "", "titulo": "Diskorrika ortuella urtza"}, {"fecha": "2022-03-31", "pueblo": "Sodupe", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Urtza", "dj": "", "notas": "[Original: Diskorrika Sodupe Urtza ]", "location": "", "titulo": "Diskorrika Sodupe Urtza "}, {"fecha": "2022-04-01", "pueblo": "adur Santurtzi", "hora_inicio": "11:00", "hora_final": "12:30", "animador": "Urtza", "dj": "", "notas": "[Original: Disko adur Urtza Santurtzi (4 bafles)]", "location": "", "titulo": "Disko adur Urtza Santurtzi (4 bafles)"}, {"fecha": "2022-04-01", "pueblo": "Laudio", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Urtza", "dj": "", "notas": "[Original: Diskorrika Laudio Urtza ]", "location": "", "titulo": "Diskorrika Laudio Urtza "}, {"fecha": "2022-04-01", "pueblo": "Berriz", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Paco + Araitz", "dj": "", "notas": "[Original: Diskorrika Berriz Paco + araitz?]", "location": "", "titulo": "Diskorrika Berriz Paco + araitz?"}, {"fecha": "2022-04-02", "pueblo": "adur zierbena", "hora_inicio": "18:15", "hora_final": "20:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko adur zierbena urtza (disko solo 19:00-20:00)]", "location": "", "titulo": "Disko adur zierbena urtza (disko solo 19:00-20:00)"}, {"fecha": "2022-04-05", "pueblo": "Izarra", "hora_inicio": "11:00", "hora_final": "12:30", "animador": "Urtza", "dj": "", "notas": "[Original: Diskorrika Izarra Urtza]", "location": "", "titulo": "Diskorrika Izarra Urtza"}, {"fecha": "2022-04-06", "pueblo": "Trapaga", "hora_inicio": "11:00", "hora_final": "12:00", "animador": "Urtza", "dj": "", "notas": "[Original: Diskorrika Trapaga urtza]", "location": "", "titulo": "Diskorrika Trapaga urtza"}, {"fecha": "2022-04-06", "pueblo": "Zuia", "hora_inicio": "15:00", "hora_final": "16:30", "animador": "Urtza", "dj": "", "notas": "[Original: Diskorrika Zuia Urtza]", "location": "", "titulo": "Diskorrika Zuia Urtza"}, {"fecha": "2022-04-06", "pueblo": "Arganzon", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Urtza", "dj": "", "notas": "[Original: Arganzon diskorrika Urtza]", "location": "", "titulo": "Arganzon diskorrika Urtza"}, {"fecha": "2022-04-07", "pueblo": "Sope", "hora_inicio": "11:00", "hora_final": "12:00", "animador": "Urtza", "dj": "", "notas": "[Original: Sope Diskorrika Urtza + tarima]", "location": "", "titulo": "Sope Diskorrika Urtza + tarima"}, {"fecha": "2022-04-07", "pueblo": "plentzia", "hora_inicio": "17:00", "hora_final": "18:30", "animador": "Urtza", "dj": "", "notas": "[Original: Diskorrika plentzia  Urtza]", "location": "", "titulo": "Diskorrika plentzia  Urtza"}, {"fecha": "2022-04-08", "pueblo": "Intxaurrondo", "hora_inicio": "19:00", "hora_final": "20:30", "animador": "Karol", "dj": "", "notas": "[Original: Diskorrika Intxaurrondo Karol]", "location": "", "titulo": "Diskorrika Intxaurrondo Karol"}, {"fecha": "2022-05-05", "pueblo": "Ntra Sra Merced", "hora_inicio": "14:30", "hora_final": "16:00", "animador": "Urtza + Paco", "dj": "", "notas": "[Original: Disko Ntra Sra Merced Paco + Urtza]", "location": "", "titulo": "Disko Ntra Sra Merced Paco + Urtza"}, {"fecha": "2022-05-18", "pueblo": "ortuella", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko ortuella urtza]", "location": "", "titulo": "Disko ortuella urtza"}, {"fecha": "2022-06-04", "pueblo": "Adur Markina", "hora_inicio": "16:30", "hora_final": "19:00", "animador": "Karol", "dj": "", "notas": "[Original: Disko Adur Markina. Karol ]", "location": "", "titulo": "Disko Adur Markina. Karol "}, {"fecha": "2022-06-07", "pueblo": "Izarra", "hora_inicio": "12:00", "hora_final": "13:30", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Izarra Urtza]", "location": "", "titulo": "Disko Izarra Urtza"}, {"fecha": "2022-06-11", "pueblo": "Lateorro", "hora_inicio": "18:00", "hora_final": "20:00", "animador": "Karol", "dj": "", "notas": "[Original: Disko Lateorro Karol]", "location": "", "titulo": "Disko Lateorro Karol"}, {"fecha": "2022-06-17", "pueblo": "barrika", "hora_inicio": "19:00", "hora_final": "21:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko barrika Urtza]", "location": "", "titulo": "Disko barrika Urtza"}, {"fecha": "2022-06-18", "pueblo": "Mungia", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Urko + Karol", "dj": "", "notas": "[Original: Disko Mungia Urko + Karol]", "location": "", "titulo": "Disko Mungia Urko + Karol"}, {"fecha": "2022-06-21", "pueblo": "Sestao", "hora_inicio": "11:00", "hora_final": "12:30", "animador": "Urko + Karol", "dj": "", "notas": "[Original: Disko Sestao. Karol + Urko]", "location": "", "titulo": "Disko Sestao. Karol + Urko"}, {"fecha": "2022-06-29", "pueblo": "Zumaia", "hora_inicio": "22:00", "hora_final": "01:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Zumaia Urtza + luces]", "location": "", "titulo": "Disko Zumaia Urtza + luces"}, {"fecha": "2022-07-22", "pueblo": "Iolan Berango", "hora_inicio": "10:30", "hora_final": "13:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Iolan Berango urtza.]", "location": "", "titulo": "Disko Iolan Berango urtza."}, {"fecha": "2022-08-08", "pueblo": "AIA", "hora_inicio": "17:00", "hora_final": "18:30", "animador": "Urtza", "dj": "", "notas": "[Original: Disko AIA urtza]", "location": "", "titulo": "Disko AIA urtza"}, {"fecha": "2022-08-08", "pueblo": "getaria", "hora_inicio": "17:30", "hora_final": "19:30", "animador": "Paco", "dj": "", "notas": "[Original: Disko getaria. Paco]", "location": "", "titulo": "Disko getaria. Paco"}, {"fecha": "2022-08-08", "pueblo": "AIA", "hora_inicio": "20:00", "hora_final": "23:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko AIA urtza]", "location": "", "titulo": "Disko AIA urtza"}, {"fecha": "2022-09-03", "pueblo": "Abornikano", "hora_inicio": "18:00", "hora_final": "20:00", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Abornikano Naiara]", "location": "", "titulo": "Disko Abornikano Naiara"}, {"fecha": "2022-09-05", "pueblo": "", "hora_inicio": "10:00", "hora_final": "11:00", "animador": "", "dj": "", "notas": "[Original: Cables disko]", "location": "", "titulo": "Cables disko"}, {"fecha": "2022-09-08", "pueblo": "ikas Gorliz", "hora_inicio": "11:30", "hora_final": "12:45", "animador": "Urtza", "dj": "", "notas": "[Original: Disko ikas Gorliz urtza]", "location": "", "titulo": "Disko ikas Gorliz urtza"}, {"fecha": "2022-09-11", "pueblo": "Iolan muntsaratz", "hora_inicio": "18:00", "hora_final": "20:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Iolan muntsaratz Urtza.]", "location": "", "titulo": "Disko Iolan muntsaratz Urtza."}, {"fecha": "2022-09-30", "pueblo": "Ortuella", "hora_inicio": "11:15", "hora_final": "12:45", "animador": "Urtza", "dj": "", "notas": "[Original: Euskal Jaia Ortuella. Disko Urtza (10:45 mikro)]", "location": "", "titulo": "Euskal Jaia Ortuella. Disko Urtza (10:45 mikro)"}, {"fecha": "2022-10-14", "pueblo": "Irún", "hora_inicio": "17:30", "hora_final": "19:30", "animador": "", "dj": "", "notas": "[Original: Irún disko erlojuak]", "location": "", "titulo": "Irún disko erlojuak"}, {"fecha": "2022-10-31", "pueblo": "Lemoiz", "hora_inicio": "00:00", "hora_final": "00:00", "animador": "", "dj": "", "notas": "[Original: Lemoiz disko + txokolate]", "location": "", "titulo": "Lemoiz disko + txokolate"}, {"fecha": "2022-11-04", "pueblo": "Urduliz", "hora_inicio": "19:00", "hora_final": "20:30", "animador": "Urtza + Rubén", "dj": "", "notas": "[Original: Euskaraldisko Urduliz Ruben + Urtza]", "location": "", "titulo": "Euskaraldisko Urduliz Ruben + Urtza"}, {"fecha": "2022-11-11", "pueblo": "Abetxuko", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Abetxuko ikastola Naiara.]", "location": "", "titulo": "Disko Abetxuko ikastola Naiara."}, {"fecha": "2022-12-02", "pueblo": "Zipiriñe", "hora_inicio": "09:30", "hora_final": "12:30", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Zipiriñe Urtza]", "location": "", "titulo": "Disko Zipiriñe Urtza"}, {"fecha": "2022-12-02", "pueblo": "Mundaka", "hora_inicio": "11:30", "hora_final": "12:30", "animador": "Paco + Mitxel", "dj": "", "notas": "[Original: Disko Mundaka Paco + Mitxel]", "location": "", "titulo": "Disko Mundaka Paco + Mitxel"}, {"fecha": "2022-12-02", "pueblo": "Donosti", "hora_inicio": "19:00", "hora_final": "20:30", "animador": "Urtza", "dj": "", "notas": "[Original: Euskaraldisko Donosti Urtza]", "location": "", "titulo": "Euskaraldisko Donosti Urtza"}, {"fecha": "2022-12-03", "pueblo": "Lemoiz", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Urtza", "dj": "", "notas": "[Original: Lemoiz Disko + Txoko. Horario? Urtza]", "location": "", "titulo": "Lemoiz Disko + Txoko. Horario? Urtza"}, {"fecha": "2022-12-08", "pueblo": "Gorliz", "hora_inicio": "19:30", "hora_final": "20:30", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Gorliz Urtza]", "location": "", "titulo": "Disko Gorliz Urtza"}, {"fecha": "2022-12-30", "pueblo": "Ortuella", "hora_inicio": "18:30", "hora_final": "21:00", "animador": "Urtza + Hodei", "dj": "", "notas": "[Original: Cotillon Ortuella + Disko Urtza+Photocall Hodei +lacasitos]", "location": "", "titulo": "Cotillon Ortuella + Disko Urtza+Photocall Hodei +lacasitos"}, {"fecha": "2022-12-31", "pueblo": "Iolan Gallarta", "hora_inicio": "12:30", "hora_final": "14:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Iolan + photocall(lona)+ 200 bolsas cotillon.  Gallarta Urtza.]", "location": "", "titulo": "Disko Iolan + photocall(lona)+ 200 bolsas cotillon.  Gallarta Urtza."}, {"fecha": "2022-12-31", "pueblo": "Iolan Bermeo", "hora_inicio": "16:00", "hora_final": "18:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Iolan Bermeo urtza + 150 bolsas cotillon]", "location": "", "titulo": "Disko Iolan Bermeo urtza + 150 bolsas cotillon"}, {"fecha": "2023-02-17", "pueblo": "Lateorro", "hora_inicio": "17:30", "hora_final": "19:30", "animador": "Naiara + Rubén", "dj": "", "notas": "[Original: Disko Lateorro Rubén + Naiara Duracion??]", "location": "", "titulo": "Disko Lateorro Rubén + Naiara Duracion??"}, {"fecha": "2023-02-17", "pueblo": "berriz", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Urtza + Urko", "dj": "", "notas": "[Original: Disko berriz urko + urtza]", "location": "", "titulo": "Disko berriz urko + urtza"}, {"fecha": "2023-02-18", "pueblo": "Zumaia", "hora_inicio": "17:00", "hora_final": "20:00", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Zumaia disko Urko + Naiara. Mas luces!!]", "location": "", "titulo": "Zumaia disko Urko + Naiara. Mas luces!!"}, {"fecha": "2023-02-18", "pueblo": "Armintza", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Karol + Sergio", "dj": "", "notas": "[Original: Disko Armintza Sergio + Karol + Chocolate]", "location": "", "titulo": "Disko Armintza Sergio + Karol + Chocolate"}, {"fecha": "2023-02-21", "pueblo": "Iolan Elorrio", "hora_inicio": "10:30", "hora_final": "13:00", "animador": "Urtza", "dj": "", "notas": "[Original: Iolan Elorrio disko urtza]", "location": "", "titulo": "Iolan Elorrio disko urtza"}, {"fecha": "2023-02-21", "pueblo": "Eibar", "hora_inicio": "17:00", "hora_final": "19:30", "animador": "Karol + Sergio", "dj": "", "notas": "[Original: Disko Eibar. Karol +Sergio(una hora de disko)]", "location": "", "titulo": "Disko Eibar. Karol +Sergio(una hora de disko)"}, {"fecha": "2023-02-21", "pueblo": "Sope", "hora_inicio": "18:00", "hora_final": "20:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Sope Urtza]", "location": "", "titulo": "Disko Sope Urtza"}, {"fecha": "2023-03-31", "pueblo": "askartza", "hora_inicio": "11:45", "hora_final": "13:15", "animador": "Urtza", "dj": "", "notas": "[Original: Disko askartza urtza]", "location": "", "titulo": "Disko askartza urtza"}, {"fecha": "2023-04-02", "pueblo": "Kanpomartxo Lutxana", "hora_inicio": "16:00", "hora_final": "17:30", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Kanpomartxo Lutxana Urtza ]", "location": "", "titulo": "Disko Kanpomartxo Lutxana Urtza "}, {"fecha": "2023-05-04", "pueblo": "Ntra Sra Merced", "hora_inicio": "14:30", "hora_final": "16:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Ntra Sra Merced Urtza]", "location": "", "titulo": "Disko Ntra Sra Merced Urtza"}, {"fecha": "2023-05-19", "pueblo": "Morlans", "hora_inicio": "18:45", "hora_final": "20:15", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Morlans Urtza]", "location": "", "titulo": "Disko Morlans Urtza"}, {"fecha": "2023-06-03", "pueblo": "Markina Adur", "hora_inicio": "16:30", "hora_final": "19:00", "animador": "Paco + Karol", "dj": "", "notas": "[Original: Disko Markina Adur Karol + Paco]", "location": "", "titulo": "Disko Markina Adur Karol + Paco"}, {"fecha": "2023-06-03", "pueblo": "Kirikiño", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Urtza + Urko", "dj": "", "notas": "[Original: Disko Kirikiño Urtza + Urko]", "location": "", "titulo": "Disko Kirikiño Urtza + Urko"}, {"fecha": "2023-06-10", "pueblo": "Ander deuna", "hora_inicio": "15:00", "hora_final": "16:30", "animador": "Urtza + Rubén", "dj": "", "notas": "[Original: Disko Ander deuna Urtza + Rubén]", "location": "", "titulo": "Disko Ander deuna Urtza + Rubén"}, {"fecha": "2023-06-10", "pueblo": "Gorliz", "hora_inicio": "16:00", "hora_final": "18:30", "animador": "Urko + Carol", "dj": "", "notas": "[Original: Disko Gorliz Carol + Urko]", "location": "", "titulo": "Disko Gorliz Carol + Urko"}, {"fecha": "2023-06-17", "pueblo": "zipiriñe", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko zipiriñe urtza]", "location": "", "titulo": "Disko zipiriñe urtza"}, {"fecha": "2023-06-21", "pueblo": "Zipiriñe", "hora_inicio": "09:30", "hora_final": "12:30", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Zipiriñe Naiara]", "location": "", "titulo": "Disko Zipiriñe Naiara"}, {"fecha": "2023-06-21", "pueblo": "Zuia", "hora_inicio": "15:00", "hora_final": "16:30", "animador": "Naiara + Paco", "dj": "", "notas": "[Original: Disko Zuia Paco + Naiara]", "location": "", "titulo": "Disko Zuia Paco + Naiara"}, {"fecha": "2023-06-21", "pueblo": "Urduliz", "hora_inicio": "17:30", "hora_final": "19:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Urduliz ikastola- Urtza]", "location": "", "titulo": "Disko Urduliz ikastola- Urtza"}, {"fecha": "2023-07-01", "pueblo": "Zumaia", "hora_inicio": "22:00", "hora_final": "01:00", "animador": "Urtza", "dj": "", "notas": "[Original: Zumaia Disko Urtza]", "location": "", "titulo": "Zumaia Disko Urtza"}, {"fecha": "2023-07-31", "pueblo": "Amara Zaharra", "hora_inicio": "16:30", "hora_final": "18:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Amara Zaharra Urtza]", "location": "", "titulo": "Disko Amara Zaharra Urtza"}, {"fecha": "2023-08-05", "pueblo": "Getaria", "hora_inicio": "17:30", "hora_final": "19:30", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Getaria Urtza]", "location": "", "titulo": "Disko Getaria Urtza"}, {"fecha": "2023-08-15", "pueblo": "Orozko", "hora_inicio": "19:00", "hora_final": "20:30", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Orozko Urtza]", "location": "", "titulo": "Disko Orozko Urtza"}, {"fecha": "2023-08-26", "pueblo": "Adur zierbena", "hora_inicio": "18:15", "hora_final": "19:15", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Adur zierbena urtza una hora 575€-15 comision]", "location": "", "titulo": "Disko Adur zierbena urtza una hora 575€-15 comision"}, {"fecha": "2023-09-07", "pueblo": "ikas Gorliz", "hora_inicio": "11:30", "hora_final": "12:45", "animador": "Naiara", "dj": "", "notas": "[Original: Disko ikas Gorliz Naiara]", "location": "", "titulo": "Disko ikas Gorliz Naiara"}, {"fecha": "2023-09-08", "pueblo": "Alkiza", "hora_inicio": "23:30", "hora_final": "02:00", "animador": "Urtza", "dj": "", "notas": "[Original: Alkiza disko urtza. Horario?]", "location": "", "titulo": "Alkiza disko urtza. Horario?"}, {"fecha": "2023-09-10", "pueblo": "Iolan Muntzaratz", "hora_inicio": "18:00", "hora_final": "20:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Iolan Muntzaratz Urtza.]", "location": "", "titulo": "Disko Iolan Muntzaratz Urtza."}, {"fecha": "2023-09-16", "pueblo": "Donosti Arroka plaza", "hora_inicio": "16:30", "hora_final": "18:30", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Donosti Arroka plaza Urtza. ]", "location": "", "titulo": "Disko Donosti Arroka plaza Urtza. "}, {"fecha": "2023-10-01", "pueblo": "urkabustaiz", "hora_inicio": "17:00", "hora_final": "18:30", "animador": "Urtza + Rubén", "dj": "", "notas": "[Original: Disko urkabustaiz Ruben + Urtza.]", "location": "", "titulo": "Disko urkabustaiz Ruben + Urtza."}, {"fecha": "2023-10-06", "pueblo": "Ortuella", "hora_inicio": "11:45", "hora_final": "13:15", "animador": "Mitxel", "dj": "", "notas": "[Original: Disko Ortuella Mitxel]", "location": "", "titulo": "Disko Ortuella Mitxel"}, {"fecha": "2023-10-06", "pueblo": "Ortuella", "hora_inicio": "22:00", "hora_final": "01:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Urtza Ortuella]", "location": "", "titulo": "Disko Urtza Ortuella"}, {"fecha": "2023-11-28", "pueblo": "Astixa", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Urtza + Rubén", "dj": "", "notas": "[Original: Disko Astixa Ruben + Urtza]", "location": "", "titulo": "Disko Astixa Ruben + Urtza"}, {"fecha": "2023-12-01", "pueblo": "Zipiriñe", "hora_inicio": "09:30", "hora_final": "12:30", "animador": "Urtza", "dj": "", "notas": "[Original: Zipiriñe Disko Urtza]", "location": "", "titulo": "Zipiriñe Disko Urtza"}, {"fecha": "2023-12-01", "pueblo": "amara zaharra", "hora_inicio": "17:30", "hora_final": "19:00", "animador": "Naiara", "dj": "", "notas": "[Original: Disko amara zaharra. Naiara.]", "location": "", "titulo": "Disko amara zaharra. Naiara."}, {"fecha": "2023-12-05", "pueblo": "Gorliz", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Mitxel", "dj": "", "notas": "[Original: Gorliz disko mitxel]", "location": "", "titulo": "Gorliz disko mitxel"}, {"fecha": "2023-12-21", "pueblo": "Donosti", "hora_inicio": "12:30", "hora_final": "14:30", "animador": "Harkaitz + Aranburu", "dj": "", "notas": "[Original: Disko Donosti Harkaitz Aranburu]", "location": "", "titulo": "Disko Donosti Harkaitz Aranburu"}, {"fecha": "2023-12-21", "pueblo": "Larrabetzu", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Larrabetzu Urtza]", "location": "", "titulo": "Disko Larrabetzu Urtza"}, {"fecha": "2024-02-09", "pueblo": "Iolan Gallarta", "hora_inicio": "12:00", "hora_final": "13:00", "animador": "Urtza + Naiara", "dj": "", "notas": "[Original: Disko Iolan Gallarta Urtza o Naiara. ]", "location": "", "titulo": "Disko Iolan Gallarta Urtza o Naiara. "}, {"fecha": "2024-02-09", "pueblo": "Berriz", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Berriz. Naiara confirmado]", "location": "", "titulo": "Disko Berriz. Naiara confirmado"}, {"fecha": "2024-02-10", "pueblo": "Zumaia", "hora_inicio": "17:00", "hora_final": "20:00", "animador": "Naiara", "dj": "", "notas": "[Original: Zumaia Disko + mozorro Naiara + disko noche]", "location": "", "titulo": "Zumaia Disko + mozorro Naiara + disko noche"}, {"fecha": "2024-02-10", "pueblo": "Getaria", "hora_inicio": "17:00", "hora_final": "19:30", "animador": "Sergio + Maialen", "dj": "", "notas": "[Original: Getaria disko Sergio + Maialen]", "location": "", "titulo": "Getaria disko Sergio + Maialen"}, {"fecha": "2024-02-10", "pueblo": "Zumaia", "hora_inicio": "22:30", "hora_final": "01:30", "animador": "Naiara", "dj": "", "notas": "[Original: Zumaia Disko + mozorro Naiara + disko noche]", "location": "", "titulo": "Zumaia Disko + mozorro Naiara + disko noche"}, {"fecha": "2024-02-11", "pueblo": "Sope", "hora_inicio": "18:00", "hora_final": "20:00", "animador": "Urtza + Naiara", "dj": "", "notas": "[Original: Sope Inauteriak disko mozorroak Urtza/Naiara]", "location": "", "titulo": "Sope Inauteriak disko mozorroak Urtza/Naiara"}, {"fecha": "2024-02-12", "pueblo": "Gatika", "hora_inicio": "18:00", "hora_final": "20:00", "animador": "", "dj": "", "notas": "[Original: Gatika Disko Carnaval TARDE]", "location": "", "titulo": "Gatika Disko Carnaval TARDE"}, {"fecha": "2024-02-13", "pueblo": "Elorrio Iolan", "hora_inicio": "10:30", "hora_final": "13:00", "animador": "Urtza + Naiara", "dj": "", "notas": "[Original: Disko Elorrio Iolan mirar horario. Doble equipo. Confirmar Urtza o Naiara]", "location": "", "titulo": "Disko Elorrio Iolan mirar horario. Doble equipo. Confirmar Urtza o Naiara"}, {"fecha": "2024-03-02", "pueblo": "Salburua", "hora_inicio": "17:30", "hora_final": "19:00", "animador": "Urko + Mitxel", "dj": "", "notas": "[Original: Diskorrika Salburua. Generador Mitxel + Urko]", "location": "", "titulo": "Diskorrika Salburua. Generador Mitxel + Urko"}, {"fecha": "2024-03-09", "pueblo": "Irun", "hora_inicio": "11:00", "hora_final": "12:30", "animador": "Naiara", "dj": "", "notas": "[Original: Diskorrika Irun Haurtxokoak. Naiara/ DJ?]", "location": "", "titulo": "Diskorrika Irun Haurtxokoak. Naiara/ DJ?"}, {"fecha": "2024-03-09", "pueblo": "Erandio", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Diskorrika Erandio. Naiara + Urko]", "location": "", "titulo": "Diskorrika Erandio. Naiara + Urko"}, {"fecha": "2024-03-13", "pueblo": "Romo", "hora_inicio": "11:15", "hora_final": "12:00", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Diskorrika Romo Naiara + Urko]", "location": "", "titulo": "Diskorrika Romo Naiara + Urko"}, {"fecha": "2024-03-14", "pueblo": "Andra Mari", "hora_inicio": "09:45", "hora_final": "10:30", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Diskorrika Andra Mari Getxo Naiara + Urko]", "location": "", "titulo": "Diskorrika Andra Mari Getxo Naiara + Urko"}, {"fecha": "2024-03-15", "pueblo": "Leioa", "hora_inicio": "11:00", "hora_final": "12:30", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Diskorrika Leioa Naiara + Urko]", "location": "", "titulo": "Diskorrika Leioa Naiara + Urko"}, {"fecha": "2024-03-15", "pueblo": "Argantzon", "hora_inicio": "17:30", "hora_final": "19:00", "animador": "Karol", "dj": "", "notas": "[Original: Diskorrika Argantzon Karol + DJ?]", "location": "", "titulo": "Diskorrika Argantzon Karol + DJ?"}, {"fecha": "2024-03-15", "pueblo": "Hernani", "hora_inicio": "17:30", "hora_final": "19:00", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Diskorrika Hernani Naiara + Urko]", "location": "", "titulo": "Diskorrika Hernani Naiara + Urko"}, {"fecha": "2024-03-17", "pueblo": "Sondika", "hora_inicio": "12:00", "hora_final": "13:30", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Diskorrika Sondika Naiara + Urko]", "location": "", "titulo": "Diskorrika Sondika Naiara + Urko"}, {"fecha": "2024-03-18", "pueblo": "Añana", "hora_inicio": "14:30", "hora_final": "15:30", "animador": "Mitxel", "dj": "", "notas": "[Original: Diskorrika Añana Mitxel + DJ?]", "location": "", "titulo": "Diskorrika Añana Mitxel + DJ?"}, {"fecha": "2024-03-18", "pueblo": "Izarra", "hora_inicio": "14:45", "hora_final": "16:15", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Diskorrika Izarra. Naiara + Urko]", "location": "", "titulo": "Diskorrika Izarra. Naiara + Urko"}, {"fecha": "2024-03-18", "pueblo": "Dulantzi", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Diskorrika Dulantzi. Naiara + Urko]", "location": "", "titulo": "Diskorrika Dulantzi. Naiara + Urko"}, {"fecha": "2024-03-20", "pueblo": "Plentzia", "hora_inicio": "17:00", "hora_final": "18:30", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Diskorrika Plentzia eskola. Naiara + Urko]", "location": "", "titulo": "Diskorrika Plentzia eskola. Naiara + Urko"}, {"fecha": "2024-03-21", "pueblo": "Trapaga", "hora_inicio": "10:30", "hora_final": "12:00", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Diskorrika Trapaga. Naiara + Urko (10:10 dena montatuta)]", "location": "", "titulo": "Diskorrika Trapaga. Naiara + Urko (10:10 dena montatuta)"}, {"fecha": "2024-03-21", "pueblo": "Ortuella", "hora_inicio": "11:15", "hora_final": "12:45", "animador": "Karol + Jaure", "dj": "", "notas": "[Original: Diskorrika Ortuella . A las 11 montado. Jaure + Karol]", "location": "", "titulo": "Diskorrika Ortuella . A las 11 montado. Jaure + Karol"}, {"fecha": "2024-03-21", "pueblo": "Orereta", "hora_inicio": "16:00", "hora_final": "17:15", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Diskorrika Orereta (1500 ume) Naiara + Urko]", "location": "", "titulo": "Diskorrika Orereta (1500 ume) Naiara + Urko"}, {"fecha": "2024-03-21", "pueblo": "Laudio", "hora_inicio": "17:30", "hora_final": "19:00", "animador": "Rubén + Mitxel", "dj": "", "notas": "[Original: Diskorrika Laudio Ruben + Mitxel (chungo)]", "location": "", "titulo": "Diskorrika Laudio Ruben + Mitxel (chungo)"}, {"fecha": "2024-03-22", "pueblo": "Sope", "hora_inicio": "10:00", "hora_final": "12:00", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Diskorrika Sope Urko.  a las 10 todo montado. Naiara + Urko ]", "location": "", "titulo": "Diskorrika Sope Urko.  a las 10 todo montado. Naiara + Urko "}, {"fecha": "2024-03-22", "pueblo": "Amurrio", "hora_inicio": "17:00", "hora_final": "18:30", "animador": "Jaure + Leire", "dj": "", "notas": "[Original: Diskorrika Amurrio Jaure + Leire]", "location": "", "titulo": "Diskorrika Amurrio Jaure + Leire"}, {"fecha": "2024-03-22", "pueblo": "Berriz", "hora_inicio": "18:15", "hora_final": "19:45", "animador": "Paco + Jon + Casamayor", "dj": "", "notas": "[Original: Diskorrika Berriz. Paco/jon casamayor]", "location": "", "titulo": "Diskorrika Berriz. Paco/jon casamayor"}, {"fecha": "2024-03-22", "pueblo": "Zornotza", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Diskorrika Zornotza Naiara + Urko]", "location": "", "titulo": "Diskorrika Zornotza Naiara + Urko"}, {"fecha": "2024-05-03", "pueblo": "Merced", "hora_inicio": "14:30", "hora_final": "16:00", "animador": "Urko + Jon", "dj": "", "notas": "[Original: Disko La Merced Urko + Jon]", "location": "", "titulo": "Disko La Merced Urko + Jon"}, {"fecha": "2024-06-07", "pueblo": "Trapagaran", "hora_inicio": "10:30", "hora_final": "13:30", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Disko Trapagaran Urko + Naiara 10:30-11:30 (sonorizazioa) + 11:30-13:30 (disko)]", "location": "", "titulo": "Disko Trapagaran Urko + Naiara 10:30-11:30 (sonorizazioa) + 11:30-13:30 (disko)"}, {"fecha": "2024-06-08", "pueblo": "Ander Deuna", "hora_inicio": "15:00", "hora_final": "16:30", "animador": "Urtza + Urko", "dj": "", "notas": "[Original: Disko Ander Deuna Urko + Urtza]", "location": "", "titulo": "Disko Ander Deuna Urko + Urtza"}, {"fecha": "2024-06-08", "pueblo": "Zipiriñe", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Naiara + Sergio", "dj": "", "notas": "[Original: Disko Zipiriñe Naiara + Sergio ]", "location": "", "titulo": "Disko Zipiriñe Naiara + Sergio "}, {"fecha": "2024-06-21", "pueblo": "Zipiriñe", "hora_inicio": "09:30", "hora_final": "12:30", "animador": "Naiara", "dj": "", "notas": "[Original: Zipiriñe disko Naiara]", "location": "", "titulo": "Zipiriñe disko Naiara"}, {"fecha": "2024-06-21", "pueblo": "Elortza", "hora_inicio": "18:00", "hora_final": "20:00", "animador": "Naiara", "dj": "", "notas": "[Original: Elortza disko Naiara]", "location": "", "titulo": "Elortza disko Naiara"}, {"fecha": "2024-06-23", "pueblo": "Murgia", "hora_inicio": "20:00", "hora_final": "22:00", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Disko Murgia Urko + naiara]", "location": "", "titulo": "Disko Murgia Urko + naiara"}, {"fecha": "2024-06-28", "pueblo": "Zumaia", "hora_inicio": "22:30", "hora_final": "01:00", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Disko Zumaia Urko + Naiara]", "location": "", "titulo": "Disko Zumaia Urko + Naiara"}, {"fecha": "2024-07-25", "pueblo": "Orereta", "hora_inicio": "15:30", "hora_final": "17:00", "animador": "Urko + Mitxel", "dj": "", "notas": "[Original: Disko Orereta Urko + Mitxel]", "location": "", "titulo": "Disko Orereta Urko + Mitxel"}, {"fecha": "2024-07-30", "pueblo": "Amara", "hora_inicio": "16:00", "hora_final": "17:30", "animador": "Urtza + Urko", "dj": "", "notas": "[Original: Disko Amara urtza + urko]", "location": "", "titulo": "Disko Amara urtza + urko"}, {"fecha": "2024-08-03", "pueblo": "Larraul", "hora_inicio": "23:00", "hora_final": "02:00", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Larraul. Naiara]", "location": "", "titulo": "Disko Larraul. Naiara"}, {"fecha": "2024-08-08", "pueblo": "Aia", "hora_inicio": "20:30", "hora_final": "22:00", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Aia. Naiara]", "location": "", "titulo": "Disko Aia. Naiara"}, {"fecha": "2024-08-08", "pueblo": "Aia", "hora_inicio": "22:30", "hora_final": "01:00", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Aia. Naiara]", "location": "", "titulo": "Disko Aia. Naiara"}, {"fecha": "2024-09-06", "pueblo": "ikas Gorliz", "hora_inicio": "11:15", "hora_final": "12:30", "animador": "Mitxel", "dj": "", "notas": "[Original: Disko ikas Gorliz Mitxel]", "location": "", "titulo": "Disko ikas Gorliz Mitxel"}, {"fecha": "2024-09-06", "pueblo": "Alkiza", "hora_inicio": "23:30", "hora_final": "01:30", "animador": "Urtza", "dj": "", "notas": "[Original: Alkiza Disko (2 horas) urtza]", "location": "", "titulo": "Alkiza Disko (2 horas) urtza"}, {"fecha": "2024-10-31", "pueblo": "Lemoiz", "hora_inicio": "19:00", "hora_final": "20:30", "animador": "Jon + Sergio", "dj": "", "notas": "[Original: Disko festa Lemoiz Sergio + Jon]", "location": "", "titulo": "Disko festa Lemoiz Sergio + Jon"}, {"fecha": "2024-11-11", "pueblo": "Zipi", "hora_inicio": "10:00", "hora_final": "11:30", "animador": "", "dj": "", "notas": "[Original: Zipi disko día?]", "location": "", "titulo": "Zipi disko día?"}, {"fecha": "2024-12-03", "pueblo": "Zipiriñe", "hora_inicio": "09:30", "hora_final": "12:30", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Disko Zipiriñe Urko + Naiara]", "location": "", "titulo": "Disko Zipiriñe Urko + Naiara"}, {"fecha": "2024-12-03", "pueblo": "sope", "hora_inicio": "17:00", "hora_final": "18:30", "animador": "Jon + Sergio", "dj": "", "notas": "[Original: Disko sope Sergio + Jon. ]", "location": "", "titulo": "Disko sope Sergio + Jon. "}, {"fecha": "2024-12-03", "pueblo": "Izarra", "hora_inicio": "17:30", "hora_final": "19:00", "animador": "Urko + Naiara", "dj": "", "notas": "[Original: Disko Izarra Urko + Naiara]", "location": "", "titulo": "Disko Izarra Urko + Naiara"}, {"fecha": "2024-12-31", "pueblo": "Gallarta Iolan", "hora_inicio": "12:30", "hora_final": "14:00", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Gallarta Iolan Naiara + photocall + 200 bolsas]", "location": "", "titulo": "Disko Gallarta Iolan Naiara + photocall + 200 bolsas"}, {"fecha": "2025-01-18", "pueblo": "Berriz", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Berriz urtza]", "location": "", "titulo": "Disko Berriz urtza"}, {"fecha": "2025-02-28", "pueblo": "Berriz", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Berriz Naiara]", "location": "", "titulo": "Disko Berriz Naiara"}, {"fecha": "2025-03-02", "pueblo": "Sope", "hora_inicio": "18:00", "hora_final": "20:00", "animador": "Urtza", "dj": "", "notas": "[Original: Sope Disko mozorros Urtza]", "location": "", "titulo": "Sope Disko mozorros Urtza"}, {"fecha": "2025-03-03", "pueblo": "Gatika", "hora_inicio": "18:00", "hora_final": "20:00", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Gatika Naiara]", "location": "", "titulo": "Disko Gatika Naiara"}, {"fecha": "2025-04-04", "pueblo": "Sope", "hora_inicio": "18:00", "hora_final": "20:30", "animador": "Mitxel", "dj": "", "notas": "[Original: Sope disko + animacion. Mitxel]", "location": "", "titulo": "Sope disko + animacion. Mitxel"}, {"fecha": "2025-05-15", "pueblo": "Gorliz", "hora_inicio": "19:00", "hora_final": "20:30", "animador": "Jon + Casamayor", "dj": "", "notas": "[Original: Gorliz Euskaraldisko Jon Casamayor]", "location": "", "titulo": "Gorliz Euskaraldisko Jon Casamayor"}, {"fecha": "2025-05-16", "pueblo": "Arratzu", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "", "dj": "", "notas": "[Original: Topagune euskaraldisko Arratzu Animador]", "location": "", "titulo": "Topagune euskaraldisko Arratzu Animador"}, {"fecha": "2025-05-16", "pueblo": "Laudio", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Rubén + Mitxel", "dj": "", "notas": "[Original: Laudio euskaraldisko mitxel + ruben]", "location": "", "titulo": "Laudio euskaraldisko mitxel + ruben"}, {"fecha": "2025-05-30", "pueblo": "Ludoland Gasteiz", "hora_inicio": "18:30", "hora_final": "20:30", "animador": "Rubén + Jon", "dj": "", "notas": "[Original: Disko Ludoland Gasteiz Ruben + Jon]", "location": "", "titulo": "Disko Ludoland Gasteiz Ruben + Jon"}, {"fecha": "2025-06-06", "pueblo": "Laukiz", "hora_inicio": "11:00", "hora_final": "12:30", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Laukiz Urtza]", "location": "", "titulo": "Disko Laukiz Urtza"}, {"fecha": "2025-06-06", "pueblo": "Bergara", "hora_inicio": "21:30", "hora_final": "23:30", "animador": "Jon + Casamayor", "dj": "", "notas": "[Original: Disko Bergara Jon Casamayor]", "location": "", "titulo": "Disko Bergara Jon Casamayor"}, {"fecha": "2025-06-08", "pueblo": "Fano", "hora_inicio": "13:30", "hora_final": "15:30", "animador": "Urtza", "dj": "", "notas": "[Original: Disko Fano urtza]", "location": "", "titulo": "Disko Fano urtza"}, {"fecha": "2025-06-14", "pueblo": "zipiriñe", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Urtza", "dj": "", "notas": "[Original: Disko fin de curso zipiriñe. Urtza]", "location": "", "titulo": "Disko fin de curso zipiriñe. Urtza"}, {"fecha": "2025-06-20", "pueblo": "Zipiriñe", "hora_inicio": "09:30", "hora_final": "12:30", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Zipiriñe Naiara]", "location": "", "titulo": "Disko Zipiriñe Naiara"}, {"fecha": "2025-06-20", "pueblo": "elortza", "hora_inicio": "18:00", "hora_final": "20:00", "animador": "Naiara", "dj": "", "notas": "[Original: Disko elortza Naiara]", "location": "", "titulo": "Disko elortza Naiara"}, {"fecha": "2025-06-21", "pueblo": "Bilbo Otxarkoaga", "hora_inicio": "17:30", "hora_final": "20:00", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Bilbo Otxarkoaga. Horario, Naiara]", "location": "", "titulo": "Disko Bilbo Otxarkoaga. Horario, Naiara"}, {"fecha": "2025-06-23", "pueblo": "barrika", "hora_inicio": "19:00", "hora_final": "20:30", "animador": "Naiara", "dj": "", "notas": "[Original: Disko barrika Naiara]", "location": "", "titulo": "Disko barrika Naiara"}, {"fecha": "2025-06-26", "pueblo": "Sope", "hora_inicio": "21:00", "hora_final": "22:30", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Sope Naiara]", "location": "", "titulo": "Disko Sope Naiara"}, {"fecha": "2025-07-11", "pueblo": "Larrabasterra", "hora_inicio": "20:30", "hora_final": "22:00", "animador": "Mitxel", "dj": "", "notas": "[Original: Disko Larrabasterra Mitxel?]", "location": "", "titulo": "Disko Larrabasterra Mitxel?"}, {"fecha": "2025-07-25", "pueblo": "Orereta", "hora_inicio": "15:30", "hora_final": "17:00", "animador": "Urko + Mitxel", "dj": "", "notas": "[Original: Disko Orereta Urko + Mitxel]", "location": "", "titulo": "Disko Orereta Urko + Mitxel"}, {"fecha": "2025-07-30", "pueblo": "Amara", "hora_inicio": "19:30", "hora_final": "21:00", "animador": "Mitxel", "dj": "", "notas": "[Original: Disko Amara mitxel]", "location": "", "titulo": "Disko Amara mitxel"}, {"fecha": "2025-08-08", "pueblo": "Getaria", "hora_inicio": "22:00", "hora_final": "00:00", "animador": "Mitxel + Jaure", "dj": "", "notas": "[Original: Disko Getaria Jaure + Mitxel]", "location": "", "titulo": "Disko Getaria Jaure + Mitxel"}, {"fecha": "2025-08-16", "pueblo": "zumaia", "hora_inicio": "22:00", "hora_final": "01:00", "animador": "", "dj": "Solo DJ", "notas": "[Original: Disko zumaia Solo DJ]", "location": "", "titulo": "Disko zumaia Solo DJ"}, {"fecha": "2025-09-08", "pueblo": "ondiz", "hora_inicio": "17:00", "hora_final": "19:00", "animador": "Jon + Casamayor", "dj": "", "notas": "[Original: Disko ondiz Jon Casamayor]", "location": "", "titulo": "Disko ondiz Jon Casamayor"}, {"fecha": "2025-10-18", "pueblo": "Urretxu", "hora_inicio": "19:00", "hora_final": "20:00", "animador": "", "dj": "", "notas": "[Original: Urretxu Disko festa (una hora)]", "location": "", "titulo": "Urretxu Disko festa (una hora)"}, {"fecha": "2025-10-21", "pueblo": "Eta kitto", "hora_inicio": "18:00", "hora_final": "19:00", "animador": "Mitxel", "dj": "", "notas": "[Original: Eta kitto disko Mitxel]", "location": "", "titulo": "Eta kitto disko Mitxel"}, {"fecha": "2025-10-31", "pueblo": "lemoiz", "hora_inicio": "19:00", "hora_final": "20:30", "animador": "Jaure", "dj": "", "notas": "[Original: Disko lemoiz Jaure solo]", "location": "", "titulo": "Disko lemoiz Jaure solo"}, {"fecha": "2025-12-03", "pueblo": "Zipiriñe", "hora_inicio": "09:30", "hora_final": "12:30", "animador": "", "dj": "", "notas": "[Original: Disko Zipiriñe ?]", "location": "", "titulo": "Disko Zipiriñe ?"}, {"fecha": "2025-12-03", "pueblo": "Amara", "hora_inicio": "17:00", "hora_final": "18:30", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Amara naiara]", "location": "", "titulo": "Disko Amara naiara"}, {"fecha": "2026-01-17", "pueblo": "berriz", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Urtza", "dj": "", "notas": "[Original: Disko berriz Urtza]", "location": "", "titulo": "Disko berriz Urtza"}, {"fecha": "2026-02-13", "pueblo": "berriz", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Naiara", "dj": "", "notas": "[Original: Disko berriz Naiara]", "location": "", "titulo": "Disko berriz Naiara"}, {"fecha": "2026-02-14", "pueblo": "Zumaia", "hora_inicio": "17:00", "hora_final": "20:00", "animador": "Naiara", "dj": "", "notas": "800€ +10iva | Ubicacion: Eusebio Gurrutxaga Plaza, 20750 Zumaia, Gipuzkoa, España | [Original: Zumaia disko + disfraces Naiara]", "location": "Eusebio Gurrutxaga Plaza, 20750 Zumaia, Gipuzkoa, España", "titulo": "Zumaia disko + disfraces Naiara"}, {"fecha": "2026-02-14", "pueblo": "Zumaia", "hora_inicio": "22:30", "hora_final": "01:30", "animador": "Naiara", "dj": "", "notas": "1250€ +10iva | Ubicacion: Cofradía mareantes zumaia | [Original: Zumaia disko + luces Naiara]", "location": "Cofradía mareantes zumaia", "titulo": "Zumaia disko + luces Naiara"}, {"fecha": "2026-02-15", "pueblo": "Sope", "hora_inicio": "18:00", "hora_final": "20:00", "animador": "Urko + Naiara", "dj": "", "notas": "P: 850€ + iva | [Original: Disko Sope + disfraces Urko + Naiara]", "location": "", "titulo": "Disko Sope + disfraces Urko + Naiara"}, {"fecha": "2026-02-16", "pueblo": "Basozelai", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Urtza + Rubén", "dj": "", "notas": "[Original: Disko Basozelai Urtza + Ruben]", "location": "", "titulo": "Disko Basozelai Urtza + Ruben"}, {"fecha": "2026-02-16", "pueblo": "Clara Campoamor", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Mitxel + Sergio", "dj": "", "notas": "[Original: Disko Clara Campoamor Mitxel + Sergio]", "location": "", "titulo": "Disko Clara Campoamor Mitxel + Sergio"}, {"fecha": "2026-02-16", "pueblo": "Kareaga", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Naiara + Jaure", "dj": "", "notas": "[Original: Disko Kareaga Naiara + Jaure]", "location": "", "titulo": "Disko Kareaga Naiara + Jaure"}, {"fecha": "2026-02-16", "pueblo": "RETUERTO", "hora_inicio": "18:00", "hora_final": "19:30", "animador": "Urko + Jon", "dj": "", "notas": "Ubicacion: CC RETUERTO, BARAKALDO | [Original: Disko RETUERTO Jon + Urko]", "location": "CC RETUERTO, BARAKALDO", "titulo": "Disko RETUERTO Jon + Urko"}, {"fecha": "2026-02-17", "pueblo": "Gatika", "hora_inicio": "18:00", "hora_final": "20:00", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Gatika Naiara]", "location": "", "titulo": "Disko Gatika Naiara"}, {"fecha": "2026-03-06", "pueblo": "Sestao", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Urtza", "dj": "", "notas": "[Original: Diskorrika Sestao. Urtza]", "location": "", "titulo": "Diskorrika Sestao. Urtza"}, {"fecha": "2026-03-14", "pueblo": "Barrika", "hora_inicio": "13:00", "hora_final": "14:30", "animador": "Naiara + Jaure", "dj": "", "notas": "Ubicacion: Barrika | [Original: Diskorrika Barrika naiara + Jaure]", "location": "Barrika", "titulo": "Diskorrika Barrika naiara + Jaure"}, {"fecha": "2026-03-15", "pueblo": "Mungia", "hora_inicio": "13:00", "hora_final": "14:30", "animador": "Naiara", "dj": "", "notas": "[Original: Diskorrika Mungia Naiara]", "location": "", "titulo": "Diskorrika Mungia Naiara"}, {"fecha": "2026-03-18", "pueblo": "Leioa", "hora_inicio": "11:00", "hora_final": "12:30", "animador": "Naiara", "dj": "", "notas": "[Original: Diskorrika Leioa naiara]", "location": "", "titulo": "Diskorrika Leioa naiara"}, {"fecha": "2026-03-21", "pueblo": "Mendialdea", "hora_inicio": "19:00", "hora_final": "20:30", "animador": "Naiara", "dj": "", "notas": "[Original: Diskorrika Mendialdea. Naiara]", "location": "", "titulo": "Diskorrika Mendialdea. Naiara"}, {"fecha": "2026-03-24", "pueblo": "Trapagaran", "hora_inicio": "10:30", "hora_final": "12:30", "animador": "Naiara", "dj": "", "notas": "[Original: Trapagaran Diskorrika. 10:30-11:00 bakarrik mikroak naiara]", "location": "", "titulo": "Trapagaran Diskorrika. 10:30-11:00 bakarrik mikroak naiara"}, {"fecha": "2026-03-25", "pueblo": "Cruces", "hora_inicio": "10:30", "hora_final": "12:00", "animador": "", "dj": "", "notas": "[Original: Diskorrika Cruces ]", "location": "", "titulo": "Diskorrika Cruces "}, {"fecha": "2026-03-26", "pueblo": "Orereta", "hora_inicio": "11:00", "hora_final": "12:30", "animador": "Naiara", "dj": "", "notas": "[Original: Diskorrika Orereta Naiara ]", "location": "", "titulo": "Diskorrika Orereta Naiara "}, {"fecha": "2026-03-26", "pueblo": "ortuella", "hora_inicio": "11:15", "hora_final": "12:45", "animador": "Jon + Jaure", "dj": "", "notas": "[Original: Diskorrika ortuella Jon (c) + Jaure (c)]", "location": "", "titulo": "Diskorrika ortuella Jon (c) + Jaure (c)"}, {"fecha": "2026-03-26", "pueblo": "Orereta", "hora_inicio": "15:45", "hora_final": "17:15", "animador": "Naiara", "dj": "", "notas": "[Original: Diskorrika Orereta Naiara ]", "location": "", "titulo": "Diskorrika Orereta Naiara "}, {"fecha": "2026-03-26", "pueblo": "Azkoitia", "hora_inicio": "17:30", "hora_final": "19:00", "animador": "Jon + Jaure", "dj": "", "notas": "[Original: Diskorrika Azkoitia Jon (c) + jaure(c)]", "location": "", "titulo": "Diskorrika Azkoitia Jon (c) + jaure(c)"}, {"fecha": "2026-03-26", "pueblo": "Laudio", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Paco", "dj": "", "notas": "[Original: Diskorrika Laudio Paco]", "location": "", "titulo": "Diskorrika Laudio Paco"}, {"fecha": "2026-03-27", "pueblo": "Sope", "hora_inicio": "11:00", "hora_final": "12:00", "animador": "Naiara", "dj": "", "notas": "[Original: Diskorrika Sope naiara]", "location": "", "titulo": "Diskorrika Sope naiara"}, {"fecha": "2026-03-27", "pueblo": "Gorliz", "hora_inicio": "19:00", "hora_final": "20:30", "animador": "Jon + Jaure", "dj": "", "notas": "[Original: Diskorrika Gorliz Jaure + Jon]", "location": "", "titulo": "Diskorrika Gorliz Jaure + Jon"}, {"fecha": "2026-03-27", "pueblo": "Salburua", "hora_inicio": "19:30", "hora_final": "20:30", "animador": "Urtza + Urko", "dj": "", "notas": "[Original: Diskorrika Salburua Urko + Urtza]", "location": "", "titulo": "Diskorrika Salburua Urko + Urtza"}, {"fecha": "2026-03-28", "pueblo": "Berriz", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Naiara + Rubén", "dj": "", "notas": "[Original: Berriz Diskorrika. Ruben + Naiara]", "location": "", "titulo": "Berriz Diskorrika. Ruben + Naiara"}, {"fecha": "2026-03-28", "pueblo": "Mundaka", "hora_inicio": "20:30", "hora_final": "22:30", "animador": "Urtza + Urko", "dj": "", "notas": "[Original: Disko Mundaka urko + urtza. 2 ordu]", "location": "", "titulo": "Disko Mundaka urko + urtza. 2 ordu"}, {"fecha": "2026-04-25", "pueblo": "Abanto zierbena", "hora_inicio": "17:30", "hora_final": "19:00", "animador": "Urko + Mitxel", "dj": "", "notas": "909,09 € + 10% | Ubicacion: Eusko Gudariak Plaza, 48500 Gallarta, Bizkaia, España | [Original: Abanto zierbena  euskaraz blai disko arima]", "location": "Eusko Gudariak Plaza, 48500 Gallarta, Bizkaia, España", "titulo": "Abanto zierbena  disko Mitxel + DJ Urko"}, {"fecha": "2026-05-07", "pueblo": "Barakaldo", "hora_inicio": "18:00", "hora_final": "19:00", "animador": "Jon", "dj": "", "notas": "Lugar: Herriko plaza | 700€ + 10% iva | Ubicacion: Herriko plaza | [Original: Barakaldo Familian - DISKO FESTA Jon (c)]", "location": "Herriko plaza", "titulo": "Barakaldo Familian - DISKO FESTA Jon (c)"}, {"fecha": "2026-05-10", "pueblo": "Kanporamartxo Erandi", "hora_inicio": "16:00", "hora_final": "17:30", "animador": "Jon", "dj": "", "notas": "Ubicacion: Asua, Erandio, Vizcaya, España | [Original: Disko Kanporamartxo Erandio Jon (c)]", "location": "Asua, Erandio, Vizcaya, España", "titulo": "Disko Kanpomartxo Erandio Jon (c)"}, {"fecha": "2026-05-23", "pueblo": "Orereta", "hora_inicio": "16:30", "hora_final": "19:30", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Orereta Naiara?]", "location": "", "titulo": "Disko Orereta Naiara?"}, {"fecha": "2026-05-30", "pueblo": "Zipiriñe", "hora_inicio": "18:30", "hora_final": "20:00", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Zipiriñe jaia. Animador?]", "location": "", "titulo": "Disko Zipiriñe jaia. Naiara"}, {"fecha": "2026-06-05", "pueblo": "Zumaia", "hora_inicio": "21:00", "hora_final": "22:00", "animador": "", "dj": "", "notas": "[Original: Zumaia Disko animador?]", "location": "", "titulo": "Zumaia Disko animador?"}, {"fecha": "2026-06-06", "pueblo": "ander deuna", "hora_inicio": "17:00", "hora_final": "18:30", "animador": "", "dj": "", "notas": "[Original: disko ander deuna]", "location": "", "titulo": "disko ander deuna"}, {"fecha": "2026-06-06", "pueblo": "Ander Deuna", "hora_inicio": "17:00", "hora_final": "18:30", "animador": "", "dj": "", "notas": "Estado: Confirmada | División: DIS | Contacto: Ziortza (Email) | Presupuesto: 200,00 € | Días: 6 junio 2026 | [Original: Ander Deuna · Disko Ander Deuna · EVT-2413]", "location": "", "titulo": "Ander Deuna · Disko Ander Deuna · EVT-2413"}, {"fecha": "2026-06-11", "pueblo": "Eta Kitto", "hora_inicio": "17:30", "hora_final": "19:00", "animador": "Mitxel", "dj": "", "notas": "Ubicacion: Errebal Plazia, Errebal Kalea, 11, 20600 Eibar, Gipuzkoa, España | [Original: Disko Eta Kitto Mitxel]", "location": "Errebal Plazia, Errebal Kalea, 11, 20600 Eibar, Gipuzkoa, España", "titulo": "Disko Eta Kitto Mitxel"}, {"fecha": "2026-06-13", "pueblo": "plentzia", "hora_inicio": "00:00", "hora_final": "00:00", "animador": "Panpotx", "dj": "", "notas": "[Original: Disko plentzia plis plas panpotx]", "location": "", "titulo": "Disko plentzia plis plas panpotx"}, {"fecha": "2026-06-14", "pueblo": "Galdakao", "hora_inicio": "17:00", "hora_final": "", "animador": "Urko + Naiara + Panpotx", "dj": "", "notas": "[Original: Disko Galdakao Panpotx Naiara + DJ Urko]", "location": "", "titulo": "Disko Galdakao Panpotx Naiara + DJ Urko"}, {"fecha": "2026-06-19", "pueblo": "Urduliz Elortza", "hora_inicio": "00:00", "hora_final": "00:00", "animador": "", "dj": "", "notas": "[Original: Urduliz Elortza Disko]", "location": "", "titulo": "Urduliz Elortza Disko"}, {"fecha": "2026-06-19", "pueblo": "Zipiriñe", "hora_inicio": "09:30", "hora_final": "12:30", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Zipiriñe Naiara?]", "location": "", "titulo": "Disko Zipiriñe Naiara"}, {"fecha": "2026-06-23", "pueblo": "Barrika", "hora_inicio": "19:00", "hora_final": "21:00", "animador": "Naiara", "dj": "", "notas": "[Original: Disko Barrika Naiara?]", "location": "", "titulo": "Disko Barrika Naiara"}, {"fecha": "2026-06-25", "pueblo": "Sope", "hora_inicio": "21:00", "hora_final": "22:30", "animador": "Naiara", "dj": "", "notas": "[Original: Sope disko naiara]", "location": "", "titulo": "Sope disko naiara"}, {"fecha": "2026-07-15", "pueblo": "Sopela ·", "hora_inicio": "20:30", "hora_final": "22:00", "animador": "Urko + Mitxel", "dj": "", "notas": "Actividad 1 | Qué: Disko festa Urko + Mitxel | Horario: 20:30-22:00 | Precio unitario: 750,00 € | ──────────── | Estado: Confirmada | División: DIS | Contacto: Nuria-Asier (Email) | Presupuesto: 750,00 € | [Original: Sopela · Disko festa Urko + Mitxel · 20:30–22:00 · EVT-2418]", "location": "", "titulo": "Sopela · Disko festa Urko + Mitxel · 20:30–22:00 · EVT-2418"}, {"fecha": "2026-07-25", "pueblo": "Orereta", "hora_inicio": "15:30", "hora_final": "17:00", "animador": "Mitxel", "dj": "", "notas": "p: 725€ + iva | Ubicacion: Koldo Mitxelena Plaza, 20100 Errenteria, Gipuzkoa, España | [Original: Disko Blaitu festa (Orereta Ikastola). Mitxel?]", "location": "Koldo Mitxelena Plaza, 20100 Errenteria, Gipuzkoa, España", "titulo": "Disko Blaitu festa (Orereta Ikastola). Mitxel?"}, {"fecha": "2026-07-30", "pueblo": "Amara", "hora_inicio": "19:30", "hora_final": "21:00", "animador": "Mitxel", "dj": "", "notas": "Ubicacion: Plaza de Easo, Easo Plaza, 20006 Donostia / San Sebastián, Gipuzkoa, España | [Original: Disko Amara Mitxel (c)]", "location": "Plaza de Easo, Easo Plaza, 20006 Donostia / San Sebastián, Gipuzkoa, España", "titulo": "Disko Amara Mitxel (c)"}, {"fecha": "2026-09-04", "pueblo": "enekuri", "hora_inicio": "20:00", "hora_final": "22:00", "animador": "", "dj": "", "notas": "[Original: Disko enekuri Animador?]", "location": "", "titulo": "Disko enekuri Animador?"}, {"fecha": "2026-09-06", "pueblo": "ondiz", "hora_inicio": "16:30", "hora_final": "", "animador": "Jon", "dj": "", "notas": "[Original: Disko ondiz, Jon?]", "location": "", "titulo": "Disko ondiz, Jon?"}, {"fecha": "2026-10-25", "pueblo": "Trapaga Zuria", "hora_inicio": "17:30", "hora_final": "19:30", "animador": "", "dj": "", "notas": "[Original: Disko Trapaga (dantza taldea- Zuria kontaktua)]", "location": "", "titulo": "Disko Trapaga (dantza taldea- Zuria kontaktua)"}];
-const GENERATED_AT = '25/07/2026 09:09';
+const GENERATED_AT = '28/07/2026 09:10';
 
+// =====================================================================
+//  Diskofestas — Arima Cool Tour
+//  Los datos (EVENTS_DATA / GENERATED_AT) los reescribe rebuild_from_calendar.py.
+//  No cambiar el formato de esas dos constantes.
+// =====================================================================
+'use strict';
 
 const $ = id => document.getElementById(id);
-function toDate(s) { if (!s) return null; const p = s.split('-').map(Number); return new Date(p[0],p[1]-1,p[2]); }
+
+// ---------- utilidades básicas ----------
+function toDate(s) {
+  if (!s) return null;
+  const p = String(s).split('-').map(Number);
+  if (p.length !== 3 || p.some(isNaN)) return null;
+  return new Date(p[0], p[1] - 1, p[2]);
+}
+function pad2(n) { return String(n).padStart(2, '0'); }
+function isoDe(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+function hoyISO() { return isoDe(new Date()); }
+function normalize(s) {
+  return (s == null ? '' : String(s)).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+function escapeHtml(s) {
+  return (s == null ? '' : String(s))
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function escapeRe(s) { return (s || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+const DIAS_CORTO = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+const MESES_CORTO = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+const MESES_LARGO = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
 function formatFecha(iso) {
   const d = toDate(iso); if (!d) return iso;
-  const dias=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'], meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  return `${dias[d.getDay()]} ${d.getDate()} ${meses[d.getMonth()]} ${d.getFullYear()}`;
+  return DIAS_CORTO[d.getDay()] + ' ' + d.getDate() + ' ' + MESES_CORTO[d.getMonth()] + ' ' + d.getFullYear();
 }
-function formatFechaCorta(iso) { const d=toDate(iso); if(!d) return iso; return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`; }
-function formatFechaSlash(iso) { const d=toDate(iso); if(!d) return iso; return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`; }
-function formatHorario(hi, hf) { hi = hi || ''; hf = hf || ''; if(hi && hf) return hi + '–' + hf; return hi || hf; }
-function hoyISO() { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
-function normalize(s) { return (s||'').toString().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim(); }
-function parsePersonas(s) { if(!s) return []; return s.split(/[+\/,]|\s+y\s+/i).map(x=>x.trim()).filter(Boolean); }
-function classifyPersona(raw) {
-  if(!raw) return { isDJ:false, clean:'' };
-  const isDJ = /\bdj\b/i.test(raw);
-  const clean = raw.replace(/\bdj\b/ig,'').replace(/\s+/g,' ').replace(/[·\-:]+$/,'').trim();
-  return { isDJ, clean: clean || raw.trim() };
-}
-function escapeRe(s){ return (s||'').replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
-function isDJEnTexto(nombre, texto) {
-  if(!nombre || !texto) return false;
-  const n = escapeRe(normalize(nombre));
-  const t = normalize(texto);
-  // "dj <nombre>" o "<nombre> dj" en el texto (título, notas, etc.)
-  const re = new RegExp('(\\bdj\\s+' + n + '\\b)|(\\b' + n + '\\s+dj\\b)', 'i');
-  return re.test(t);
-}
-function esDJEnEvento(nombreLimpio, e) {
-  const contexto = (e.titulo||'') + ' | ' + (e.notas||'');
-  return isDJEnTexto(nombreLimpio, contexto);
-}
-function animadoresDe(e) {
-  return parsePersonas(e.animador)
-    .map(p=>classifyPersona(p))
-    .filter(c=>c.clean && !c.isDJ && !esDJEnEvento(c.clean, e))
-    .map(c=>c.clean);
-}
-function djsDe(e) {
-  const directos = parsePersonas(e.dj).map(p=>classifyPersona(p).clean).filter(Boolean);
-  const reclasifPorTag = parsePersonas(e.animador).map(p=>classifyPersona(p)).filter(c=>c.isDJ && c.clean).map(c=>c.clean);
-  const reclasifPorTitulo = parsePersonas(e.animador).map(p=>classifyPersona(p)).filter(c=>!c.isDJ && c.clean && esDJEnEvento(c.clean, e)).map(c=>c.clean);
-  const seen = new Set();
-  return [...directos, ...reclasifPorTag, ...reclasifPorTitulo].filter(n=>{ const k=normalize(n); if(!k||seen.has(k)) return false; seen.add(k); return true; });
-}
-const HOY = hoyISO();
-// Ahora trabajamos con TODOS los eventos (pasados + futuros). El filtro por defecto "Desde hoy" sigue aplicándose, pero el usuario puede borrarlo o retroceder la fecha para buscar eventos anteriores.
-const FUTUROS = EVENTS_DATA.slice().sort((a,b)=>a.fecha.localeCompare(b.fecha)||(a.hora_inicio||'').localeCompare(b.hora_inicio||''));
-let CURRENT_RESULTS = FUTUROS.slice();
-// Toggle "Ver pasados" (F3)
-let VER_PASADOS = false;
-const STATE_KEY = 'diskofestas_state_v2';
-
-// ===== INIT INLINE =====
-function toggleFiltros(btn) {
-  var body = document.getElementById('filtersBody');
-  var collapsed = body.classList.toggle('collapsed');
-  btn.textContent = collapsed ? '▼' : '▲';
-}
-// (Inline DOMContentLoaded retirado — todo se inicializa ahora desde init() al final del script para evitar dobles listeners y respetar loadState antes del primer render.)
-
-function populateSelects() {
-  const animSet=new Set(), djSet=new Set(), puebloSet=new Set();
-  // Origen según toggle "Ver pasados": por defecto sólo eventos a partir de hoy
-  const origen = VER_PASADOS ? FUTUROS : FUTUROS.filter(e=>e.fecha>=hoyISO());
-  origen.forEach(e=>{
-    animadoresDe(e).forEach(a=>animSet.add(a));
-    djsDe(e).forEach(d=>djSet.add(d));
-    if(e.pueblo && e.pueblo.trim()) puebloSet.add(e.pueblo.trim());
-  });
-  const sP = $('fPueblo');
-  const valorActual = sP.value;
-  sP.innerHTML = '<option value="">Todos</option>';
-  [...puebloSet].sort((a,b)=>a.localeCompare(b,'es')).forEach(p=>{ const o=document.createElement('option'); o.value=p; o.textContent=p; sP.appendChild(o); });
-  if(valorActual && [...puebloSet].includes(valorActual)) sP.value = valorActual;
-  // Datalists de animador/DJ: solo nombres con eventos en el rango actual (futuro por defecto)
-  fillDatalist('dlAnimador', [...animSet].sort((a,b)=>a.localeCompare(b,'es')));
-  fillDatalist('dlDJ', [...djSet].sort((a,b)=>a.localeCompare(b,'es')));
-}
-function fillDatalist(id, items) {
-  const dl = $(id); if(!dl) return;
-  dl.innerHTML = items.map(v => `<option value="${v.replace(/"/g,'&quot;')}">`).join('');
-}
-function applyFilters() {
-  const fp=$('fPueblo').value.trim();
-  const fDesdeRaw=$('fDesde').value;
-  const fDesde = fDesdeRaw || (VER_PASADOS ? '0000-01-01' : hoyISO());
-  const fHasta=$('fHasta').value, fTxt=normalize($('fTexto').value);
-  const orden = $('fOrden').value || 'fecha';
-  // Animador y DJ ahora son inputs de texto (substring, case-insensitive)
-  const fAnim = normalize($('fAnimador').value);
-  const fDj   = normalize($('fDJ').value);
-  CURRENT_RESULTS=FUTUROS.filter(e=>{
-    if(fAnim && !animadoresDe(e).some(a=>normalize(a).includes(fAnim))) return false;
-    if(fDj   && !djsDe(e).some(d=>normalize(d).includes(fDj))) return false;
-    if(fp && normalize(e.pueblo)!==normalize(fp)) return false;
-    if(e.fecha<fDesde) return false;
-    if(fHasta && e.fecha>fHasta) return false;
-    if(fTxt && !normalize(`${e.pueblo} ${e.animador} ${e.dj} ${e.notas} ${e.titulo}`).includes(fTxt)) return false;
-    return true;
-  });
-  // Ordenación (V2)
-  CURRENT_RESULTS.sort((a,b)=>{
-    if(orden==='fecha_desc') return (b.fecha.localeCompare(a.fecha)) || ((b.hora_inicio||'').localeCompare(a.hora_inicio||''));
-    if(orden==='animador') return (animadoresDe(a).join(' + ')||'~').localeCompare(animadoresDe(b).join(' + ')||'~','es') || a.fecha.localeCompare(b.fecha);
-    if(orden==='pueblo')   return (a.pueblo||'~').localeCompare(b.pueblo||'~','es') || a.fecha.localeCompare(b.fecha);
-    if(orden==='dj')       return (djsDe(a).join(' + ')||'~').localeCompare(djsDe(b).join(' + ')||'~','es') || a.fecha.localeCompare(b.fecha);
-    return a.fecha.localeCompare(b.fecha) || (a.hora_inicio||'').localeCompare(b.hora_inicio||'');
-  });
-  renderResults();
-  saveState();
-}
-// ===== Atajos de fecha (F1) =====
-function applyDateShortcut(key) {
-  const hoy = new Date();
-  const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  let desde = new Date(hoy), hasta = null;
-  if(key==='hoy') { hasta = new Date(hoy); }
-  else if(key==='finde') {
-    // Próximo viernes-domingo (si hoy es vie/sab/dom, ese mismo)
-    const dow = hoy.getDay(); // 0 dom, 5 vie, 6 sab
-    let diasAlVie;
-    if(dow===5||dow===6||dow===0) diasAlVie = 0; // ya estamos en finde
-    else diasAlVie = 5 - dow; // lun→4, mar→3, mie→2, jue→1
-    desde.setDate(hoy.getDate() + diasAlVie);
-    if(dow===6) { desde.setDate(hoy.getDate()); } // si es sab, desde hoy
-    if(dow===0) { desde.setDate(hoy.getDate()); } // si es dom, desde hoy
-    hasta = new Date(desde);
-    // Avanzar hasta domingo
-    const dowDesde = desde.getDay();
-    if(dowDesde===5) hasta.setDate(desde.getDate()+2);
-    else if(dowDesde===6) hasta.setDate(desde.getDate()+1);
-    else hasta = new Date(desde); // domingo
-  }
-  else if(key==='mes') {
-    desde = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-    if(desde < new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate())) desde = new Date(hoy);
-    hasta = new Date(hoy.getFullYear(), hoy.getMonth()+1, 0);
-  }
-  else if(key==='d30') { hasta = new Date(hoy); hasta.setDate(hoy.getDate()+30); }
-  else if(key==='m3')  { hasta = new Date(hoy); hasta.setMonth(hoy.getMonth()+3); }
-  $('fDesde').value = fmt(desde);
-  $('fHasta').value = hasta ? fmt(hasta) : '';
-  document.querySelectorAll('.date-chip').forEach(c=>c.classList.toggle('active', c.dataset.shortcut===key));
-  applyFilters();
-}
-// ===== Persistencia (F4) =====
-function saveState() {
-  try {
-    const st = {
-      anim: $('fAnimador').value,
-      dj: $('fDJ').value,
-      pueblo: $('fPueblo').value,
-      desde: $('fDesde').value,
-      hasta: $('fHasta').value,
-      texto: $('fTexto').value,
-      orden: $('fOrden').value,
-      pasados: VER_PASADOS
-    };
-    localStorage.setItem(STATE_KEY, JSON.stringify(st));
-  } catch(e) {}
-}
-function loadState() {
-  try {
-    const raw = localStorage.getItem(STATE_KEY);
-    if(!raw) return false;
-    const st = JSON.parse(raw);
-    if(typeof st.anim === 'string') $('fAnimador').value = st.anim;
-    if(typeof st.dj === 'string') $('fDJ').value = st.dj;
-    if(st.pasados) {
-      VER_PASADOS = true;
-      const t = $('tPasados'); if(t){ t.classList.add('on'); t.setAttribute('aria-checked','true'); }
-    }
-    if(st.pueblo) $('fPueblo').value = st.pueblo;
-    if(st.desde !== undefined) $('fDesde').value = st.desde;
-    if(st.hasta) $('fHasta').value = st.hasta;
-    if(st.texto) $('fTexto').value = st.texto;
-    if(st.orden) $('fOrden').value = st.orden;
-    return true;
-  } catch(e) { return false; }
-}
-// ===== Helpers para formato detallado (Bezeroa) =====
+function formatFechaCorta(iso) { const d = toDate(iso); return d ? pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + '/' + d.getFullYear() : iso; }
+function formatFechaSlash(iso) { const d = toDate(iso); return d ? d.getFullYear() + '/' + pad2(d.getMonth() + 1) + '/' + pad2(d.getDate()) : iso; }
+function formatHorario(hi, hf) { hi = hi || ''; hf = hf || ''; return (hi && hf) ? hi + '–' + hf : (hi || hf); }
+function nombreMes(iso) { const d = toDate(iso); return d ? MESES_LARGO[d.getMonth()] + ' ' + d.getFullYear() : ''; }
+function claveMes(iso) { const d = toDate(iso); return d ? d.getFullYear() + '-' + pad2(d.getMonth() + 1) : ''; }
 function addMinutes(hora, mins) {
-  if(!hora || !/^\d{2}:\d{2}$/.test(hora)) return '';
-  const [h,m]=hora.split(':').map(Number);
-  let total=h*60+m+mins;
-  if(total<0) total+=24*60;
-  if(total>=24*60) total-=24*60;
-  const nh=Math.floor(total/60)%24, nm=total%60;
-  return String(nh).padStart(2,'0')+':'+String(nm).padStart(2,'0');
+  if (!hora || !/^\d{1,2}:\d{2}$/.test(hora)) return '';
+  const p = hora.split(':').map(Number);
+  let total = p[0] * 60 + p[1] + mins;
+  total = ((total % 1440) + 1440) % 1440;
+  return pad2(Math.floor(total / 60)) + ':' + pad2(total % 60);
 }
-function extractNota(notas, labels) {
-  if(!notas) return '';
-  for(const label of labels){
-    const re=new RegExp('\\b'+label+'\\s*[:\\-]\\s*([^|\\n]+)','i');
-    const m=notas.match(re);
-    if(m){ const v=m[1].trim(); if(v) return v; }
-  }
-  return '';
+function plural(n, sing, plur) { return n + ' ' + (n === 1 ? sing : plur); }
+// Los pueblos vienen del título del evento y a veces en minúscula ("enekuri", "sope").
+// Solo se capitaliza cuando TODO está en minúscula, para no tocar "Trapaga Zuria".
+function mostrarPueblo(p) {
+  p = (p || '').trim();
+  if (!p || p !== p.toLowerCase()) return p;
+  return p.replace(/(^|[\s·\-\/])([a-záéíóúñü])/g, (m, sep, c) => sep + c.toUpperCase());
 }
-function getAparkatzeko(e) {
-  const custom=extractNota(e.notas, ['aparkatzeko leku','aparkatzeko','aparcamiento','parking','furgoneta','matr[ií]cula']);
-  return custom || 'Ford Transit 5154 KWY';
+
+// ---------- clasificación animador / DJ ----------
+function parsePersonas(s) {
+  if (!s) return [];
+  return String(s).split(/[+\/,]|\s+y\s+/i).map(x => x.trim()).filter(Boolean);
 }
-function getKontaktua(e) {
-  const custom=extractNota(e.notas, ['kontaktua','contacto','tel[ée]fono','tel','phone']);
-  return custom || '665712802';
+function classifyPersona(raw) {
+  if (!raw) return { isDJ: false, clean: '' };
+  const isDJ = /\bdj\b/i.test(raw);
+  const clean = raw.replace(/\bdj\b/ig, '').replace(/\s+/g, ' ').replace(/[·\-:]+$/, '').trim();
+  return { isDJ: isDJ, clean: clean || raw.trim() };
 }
+function isDJEnTexto(nombre, texto) {
+  if (!nombre || !texto) return false;
+  const n = escapeRe(normalize(nombre));
+  const re = new RegExp('(\\bdj\\s+' + n + '\\b)|(\\b' + n + '\\s+dj\\b)', 'i');
+  return re.test(normalize(texto));
+}
+function animadoresDe(ev) {
+  const contexto = (ev.titulo || '') + ' | ' + (ev.notas || '');
+  return parsePersonas(ev.animador).map(classifyPersona)
+    .filter(c => c.clean && !c.isDJ && !isDJEnTexto(c.clean, contexto))
+    .map(c => c.clean);
+}
+function djsDe(ev) {
+  const contexto = (ev.titulo || '') + ' | ' + (ev.notas || '');
+  const directos = parsePersonas(ev.dj).map(p => classifyPersona(p).clean).filter(Boolean);
+  const desdeAnim = parsePersonas(ev.animador).map(classifyPersona)
+    .filter(c => c.clean && (c.isDJ || isDJEnTexto(c.clean, contexto)))
+    .map(c => c.clean);
+  const seen = new Set();
+  return directos.concat(desdeAnim).filter(n => {
+    const k = normalize(n);
+    if (!k || seen.has(k)) return false;
+    seen.add(k); return true;
+  });
+}
+function limpiarNotas(notas) {
+  if (!notas) return '';
+  return String(notas)
+    .replace(/\[Original:.*?\]/g, '')
+    .replace(/Ubicacion:[^|]*/gi, '')
+    .replace(/\|\s*\|/g, '|')
+    .replace(/^\s*\|\s*|\s*\|\s*$/g, '')
+    .trim();
+}
+
+// ---------- provincia ----------
 function extractProvincia(location) {
-  if(!location) return '';
-  const t = location.toLowerCase();
-  // Por nombre explícito (castellano o euskera)
-  if(/\b(bizkaia|vizcaya)\b/i.test(location)) return 'Bizkaia';
-  if(/\b(gipuzkoa|guip[uú]zcoa)\b/i.test(location)) return 'Gipuzkoa';
-  if(/\b(araba|[aá]lava)\b/i.test(location)) return 'Araba';
-  if(/\b(nafarroa|navarra)\b/i.test(location)) return 'Nafarroa';
-  // Por código postal
-  const cp = location.match(/\b(\d{5})\b/);
-  if(cp) {
-    const p = cp[1].slice(0,2);
-    if(p==='48') return 'Bizkaia';
-    if(p==='20') return 'Gipuzkoa';
-    if(p==='01') return 'Araba';
-    if(p==='31') return 'Nafarroa';
+  if (!location) return '';
+  if (/\b(bizkaia|vizcaya)\b/i.test(location)) return 'Bizkaia';
+  if (/\b(gipuzkoa|guip[uú]zcoa)\b/i.test(location)) return 'Gipuzkoa';
+  if (/\b(araba|[aá]lava)\b/i.test(location)) return 'Araba';
+  if (/\b(nafarroa|navarra)\b/i.test(location)) return 'Nafarroa';
+  const cp = String(location).match(/\b(\d{5})\b/);
+  if (cp) {
+    const p = cp[1].slice(0, 2);
+    if (p === '48') return 'Bizkaia';
+    if (p === '20') return 'Gipuzkoa';
+    if (p === '01') return 'Araba';
+    if (p === '31') return 'Nafarroa';
   }
   return '';
 }
-function extractCalleYPueblo(location, pueblo) {
-  if(!location) return { calle:'', pueblo: pueblo||'' };
-  // Partes separadas por coma
-  let parts = location.split(',').map(s=>s.trim()).filter(Boolean);
-  // Quitar España / Spain del final
-  while(parts.length && /^(espa[ñn]a|spain)$/i.test(parts[parts.length-1])) parts.pop();
-  // Quitar provincia del final
-  while(parts.length && /\b(bizkaia|vizcaya|gipuzkoa|guip[uú]zcoa|araba|[aá]lava|nafarroa|navarra)\b/i.test(parts[parts.length-1])) parts.pop();
-  // Buscar parte con CP para extraer pueblo
-  let calleParts = [];
-  let puebloDetectado = '';
-  for(const part of parts) {
-    const cpMatch = part.match(/^\s*(\d{5})\s+(.+)$/);
-    if(cpMatch) {
-      puebloDetectado = cpMatch[2].trim();
-    } else if(!puebloDetectado) {
-      calleParts.push(part);
-    }
-  }
-  // Si no se detectó CP, usar última parte como pueblo (si hay más de una)
-  if(!puebloDetectado && calleParts.length > 1) {
-    puebloDetectado = calleParts.pop();
-  }
-  const calle = calleParts.join(', ').trim();
-  const puebloFinal = puebloDetectado || pueblo || '';
-  return { calle, pueblo: puebloFinal };
-}
-function getLekua(e) {
-  const loc = e.location || '';
-  const { calle, pueblo } = extractCalleYPueblo(loc, e.pueblo||'');
-  const provincia = extractProvincia(loc);
-  const puebloConProv = provincia ? `${pueblo} (${provincia})` : pueblo;
-  if(calle && puebloConProv) return `${calle}, ${puebloConProv}`;
-  if(calle) return calle;
-  if(puebloConProv) return puebloConProv;
-  return 'Por confirmar';
-}
-// ===== PRECIOS (animadores / DJs con tarifa) =====
-// Tarifas: Disko de 1h30 (clave 90) y de 2h (clave 120)
-const PRECIOS = {
-  'mitxel': { 90:{bizkaia:170,gipuzkoa:190,araba:190}, 120:{bizkaia:220,gipuzkoa:240,araba:240} },
-  'jon':    { 90:{bizkaia:170,gipuzkoa:190,araba:190}, 120:{bizkaia:220,gipuzkoa:240,araba:240} },
-  'naiara': { 90:{any:150}, 120:{any:200} },
-  'urtza':  { 90:{any:150}, 120:{any:200} }
-};
-// Heurística pueblo → provincia (para eventos sin location)
 const PUEBLO_PROV = {
   // Bizkaia
-  'berriz':'Bizkaia','sope':'Bizkaia','sopela':'Bizkaia','sopelana':'Bizkaia','gallarta':'Bizkaia',
-  'erandio':'Bizkaia','ermua':'Bizkaia','orduña':'Bizkaia','urduña':'Bizkaia','barrika':'Bizkaia',
-  'gorliz':'Bizkaia','lemoiz':'Bizkaia','mungia':'Bizkaia','sestao':'Bizkaia','ortuella':'Bizkaia',
-  'basozelai':'Bizkaia','laukiz':'Bizkaia','armintza':'Bizkaia','elorrio':'Bizkaia','abadiño':'Bizkaia',
-  'barakaldo':'Bizkaia','kareaga':'Bizkaia','retuerto':'Bizkaia','santurtzi':'Bizkaia','zierbena':'Bizkaia',
-  'plentzia':'Bizkaia','urduliz':'Bizkaia','berango':'Bizkaia','muntsaratz':'Bizkaia','muntzaratz':'Bizkaia',
-  'larrabasterra':'Bizkaia','iolan':'Bizkaia','bilbo':'Bizkaia','bilbao':'Bizkaia','otxarkoaga':'Bizkaia',
-  'gatika':'Bizkaia','mundaka':'Bizkaia','markina':'Bizkaia','ondiz':'Bizkaia','enekuri':'Bizkaia',
-  'trapaga':'Bizkaia','trapagaran':'Bizkaia','abanto':'Bizkaia','nocedal':'Bizkaia','bermeo':'Bizkaia',
-  'larrabetzu':'Bizkaia','lutxana':'Bizkaia','basauri':'Bizkaia','leioa':'Bizkaia','askartza':'Bizkaia',
-  'kirikiño':'Bizkaia','carreras':'Bizkaia','las carreras':'Bizkaia','adur':'Bizkaia','zipiriñe':'Bizkaia',
-  'ander deuna':'Bizkaia','kanpomartxo':'Bizkaia','kanporamartxo':'Bizkaia','fano':'Bizkaia',
-  'elortza':'Bizkaia','astixa':'Bizkaia','altzaga':'Bizkaia','lateorro':'Bizkaia','zipi':'Bizkaia',
-  'clara campoamor':'Bizkaia','buenos aires':'Bizkaia','nocedal':'Bizkaia','basoze':'Bizkaia',
+  'berriz': 'Bizkaia', 'sopela': 'Bizkaia', 'sopelana': 'Bizkaia', 'sope': 'Bizkaia', 'gallarta': 'Bizkaia',
+  'erandio': 'Bizkaia', 'ermua': 'Bizkaia', 'orduña': 'Bizkaia', 'urduña': 'Bizkaia', 'barrika': 'Bizkaia',
+  'gorliz': 'Bizkaia', 'lemoiz': 'Bizkaia', 'mungia': 'Bizkaia', 'sestao': 'Bizkaia', 'ortuella': 'Bizkaia',
+  'basozelai': 'Bizkaia', 'basoze': 'Bizkaia', 'laukiz': 'Bizkaia', 'armintza': 'Bizkaia', 'elorrio': 'Bizkaia',
+  'abadiño': 'Bizkaia', 'barakaldo': 'Bizkaia', 'kareaga': 'Bizkaia', 'retuerto': 'Bizkaia', 'santurtzi': 'Bizkaia',
+  'zierbena': 'Bizkaia', 'plentzia': 'Bizkaia', 'urduliz': 'Bizkaia', 'berango': 'Bizkaia', 'muntsaratz': 'Bizkaia',
+  'muntzaratz': 'Bizkaia', 'larrabasterra': 'Bizkaia', 'iolan': 'Bizkaia', 'bilbo': 'Bizkaia', 'bilbao': 'Bizkaia',
+  'otxarkoaga': 'Bizkaia', 'gatika': 'Bizkaia', 'mundaka': 'Bizkaia', 'markina': 'Bizkaia', 'ondiz': 'Bizkaia',
+  'enekuri': 'Bizkaia', 'trapaga': 'Bizkaia', 'trapagaran': 'Bizkaia', 'abanto': 'Bizkaia', 'nocedal': 'Bizkaia',
+  'bermeo': 'Bizkaia', 'larrabetzu': 'Bizkaia', 'lutxana': 'Bizkaia', 'basauri': 'Bizkaia', 'leioa': 'Bizkaia',
+  'askartza': 'Bizkaia', 'kirikiño': 'Bizkaia', 'las carreras': 'Bizkaia', 'carreras': 'Bizkaia', 'adur': 'Bizkaia',
+  'zipiriñe': 'Bizkaia', 'zipi': 'Bizkaia', 'ander deuna': 'Bizkaia', 'kanporamartxo': 'Bizkaia', 'kanpomartxo': 'Bizkaia',
+  'fano': 'Bizkaia', 'elortza': 'Bizkaia', 'astixa': 'Bizkaia', 'altzaga': 'Bizkaia', 'lateorro': 'Bizkaia',
+  'clara campoamor': 'Bizkaia', 'buenos aires': 'Bizkaia',
   // Gipuzkoa
-  'zumaia':'Gipuzkoa','getaria':'Gipuzkoa','eibar':'Gipuzkoa','orereta':'Gipuzkoa','errenteria':'Gipuzkoa',
-  'donosti':'Gipuzkoa','donostia':'Gipuzkoa','amara':'Gipuzkoa','alkiza':'Gipuzkoa','aia':'Gipuzkoa',
-  'urretxu':'Gipuzkoa','bergara':'Gipuzkoa','irun':'Gipuzkoa','irún':'Gipuzkoa','morlans':'Gipuzkoa',
-  'merced':'Gipuzkoa','larraul':'Gipuzkoa','eta kitto':'Gipuzkoa','amara zaharra':'Gipuzkoa',
-  'ntra sra merced':'Gipuzkoa',
+  'zumaia': 'Gipuzkoa', 'getaria': 'Gipuzkoa', 'eibar': 'Gipuzkoa', 'orereta': 'Gipuzkoa', 'errenteria': 'Gipuzkoa',
+  'donostia': 'Gipuzkoa', 'donosti': 'Gipuzkoa', 'amara zaharra': 'Gipuzkoa', 'amara': 'Gipuzkoa', 'alkiza': 'Gipuzkoa',
+  'aia': 'Gipuzkoa', 'urretxu': 'Gipuzkoa', 'bergara': 'Gipuzkoa', 'irun': 'Gipuzkoa', 'irún': 'Gipuzkoa',
+  'morlans': 'Gipuzkoa', 'ntra sra merced': 'Gipuzkoa', 'merced': 'Gipuzkoa', 'larraul': 'Gipuzkoa', 'eta kitto': 'Gipuzkoa',
   // Araba
-  'gasteiz':'Araba','vitoria':'Araba','laudio':'Araba','llodio':'Araba','murgia':'Araba','izarra':'Araba',
-  'abetxuko':'Araba','abornikano':'Araba','zuia':'Araba','urkabustaiz':'Araba','ludoland':'Araba'
+  'gasteiz': 'Araba', 'vitoria': 'Araba', 'laudio': 'Araba', 'llodio': 'Araba', 'murgia': 'Araba', 'izarra': 'Araba',
+  'abetxuko': 'Araba', 'abornikano': 'Araba', 'zuia': 'Araba', 'urkabustaiz': 'Araba', 'ludoland': 'Araba'
 };
-function getProvinciaEv(e) {
-  const fromLoc = extractProvincia(e.location || '');
-  if(fromLoc) return fromLoc;
-  const pueblo = normalize(e.pueblo || '');
-  if(!pueblo) return '';
-  for(const key of Object.keys(PUEBLO_PROV)) {
-    if(pueblo.includes(key)) return PUEBLO_PROV[key];
+// Claves normalizadas y ordenadas de más larga a más corta, con límites de palabra
+// (antes 'orduña' o 'abadiño' nunca casaban porque el pueblo venía normalizado sin tildes).
+const PROV_KEYS = Object.keys(PUEBLO_PROV)
+  .map(k => ({ re: new RegExp('(^|[^a-z0-9])' + escapeRe(normalize(k)) + '([^a-z0-9]|$)'), prov: PUEBLO_PROV[k], len: k.length }))
+  .sort((a, b) => b.len - a.len);
+function provinciaDe(ev) {
+  const fromLoc = extractProvincia(ev.location || '');
+  if (fromLoc) return fromLoc;
+  const pueblo = normalize(ev.pueblo || '');
+  if (!pueblo) return '';
+  for (let i = 0; i < PROV_KEYS.length; i++) if (PROV_KEYS[i].re.test(pueblo)) return PROV_KEYS[i].prov;
+  return '';
+}
+
+// ---------- lugar ----------
+function extractCalleYPueblo(location, pueblo) {
+  if (!location) return { calle: '', pueblo: pueblo || '' };
+  let parts = String(location).split(',').map(s => s.trim()).filter(Boolean);
+  while (parts.length && /^(espa[ñn]a|spain)$/i.test(parts[parts.length - 1])) parts.pop();
+  while (parts.length && /\b(bizkaia|vizcaya|gipuzkoa|guip[uú]zcoa|araba|[aá]lava|nafarroa|navarra)\b/i.test(parts[parts.length - 1])) parts.pop();
+  let calleParts = [], puebloDetectado = '';
+  for (const part of parts) {
+    const cpMatch = part.match(/^\s*(\d{5})\s+(.+)$/);
+    if (cpMatch) puebloDetectado = cpMatch[2].trim();
+    else if (!puebloDetectado) calleParts.push(part);
+  }
+  if (!puebloDetectado && calleParts.length > 1) puebloDetectado = calleParts.pop();
+  return { calle: calleParts.join(', ').trim(), pueblo: puebloDetectado || pueblo || '' };
+}
+function lekuaDe(ev) {
+  const loc = ev.location || '';
+  const cp = extractCalleYPueblo(loc, ev.pueblo || '');
+  const prov = extractProvincia(loc);
+  const puebloConProv = prov ? cp.pueblo + ' (' + prov + ')' : cp.pueblo;
+  if (cp.calle && puebloConProv) return cp.calle + ', ' + puebloConProv;
+  return cp.calle || puebloConProv || '';
+}
+function extractNota(notas, labels) {
+  if (!notas) return '';
+  for (const label of labels) {
+    const m = String(notas).match(new RegExp('\\b' + label + '\\s*[:\\-]\\s*([^|\\n]+)', 'i'));
+    if (m && m[1].trim()) return m[1].trim();
   }
   return '';
 }
-function getDuracionMin(e) {
-  if(!e.hora_inicio || !e.hora_final) return null;
-  if(e.hora_inicio === '00:00' && e.hora_final === '00:00') return null;
-  const [h1,m1] = (e.hora_inicio||'').split(':').map(Number);
-  const [h2,m2] = (e.hora_final||'').split(':').map(Number);
-  if(isNaN(h1)||isNaN(h2)||isNaN(m1)||isNaN(m2)) return null;
-  let total = (h2*60+m2) - (h1*60+m1);
-  if(total <= 0) total += 24*60;
+const FURGONETA_DEF = 'Ford Transit 5154 KWY';
+const TELEFONO_DEF = '665712802';
+function getAparkatzeko(ev) { return extractNota(ev.notas, ['aparkatzeko leku', 'aparkatzeko', 'aparcamiento', 'parking', 'furgoneta', 'matr[ií]cula']) || FURGONETA_DEF; }
+function getKontaktua(ev) { return extractNota(ev.notas, ['kontaktua', 'contacto', 'tel[ée]fono', 'tel', 'phone']) || TELEFONO_DEF; }
+
+// ---------- tarifas ----------
+const PRECIOS = {
+  'mitxel': { 90: { bizkaia: 170, gipuzkoa: 190, araba: 190 }, 120: { bizkaia: 220, gipuzkoa: 240, araba: 240 } },
+  'jon':    { 90: { bizkaia: 170, gipuzkoa: 190, araba: 190 }, 120: { bizkaia: 220, gipuzkoa: 240, araba: 240 } },
+  'naiara': { 90: { any: 150 }, 120: { any: 200 } },
+  'urtza':  { 90: { any: 150 }, 120: { any: 200 } }
+};
+function duracionMin(ev) {
+  if (!ev.hora_inicio || !ev.hora_final) return null;
+  if (ev.hora_inicio === '00:00' && ev.hora_final === '00:00') return null;
+  const a = String(ev.hora_inicio).split(':').map(Number);
+  const b = String(ev.hora_final).split(':').map(Number);
+  if (a.length < 2 || b.length < 2 || a.some(isNaN) || b.some(isNaN)) return null;
+  let total = (b[0] * 60 + b[1]) - (a[0] * 60 + a[1]);
+  if (total <= 0) total += 1440;
   return total;
 }
-function getTarifaKey(durMin) {
-  if(durMin == null) return null;
-  if(durMin >= 75 && durMin <= 105) return 90;
-  if(durMin >= 110 && durMin <= 135) return 120;
+function tarifaKeyDe(durMin) {
+  if (durMin == null) return null;
+  if (durMin >= 75 && durMin <= 105) return 90;
+  if (durMin >= 110 && durMin <= 135) return 120;
   return null;
 }
-// Retorna null, o { precio, provincia, tarifaKey, rango? }
-function getPrecio(e, nombre) {
-  if(!nombre) return null;
-  const key = normalize(nombre);
-  const pricing = PRECIOS[key];
-  if(!pricing) return null;
-  const dur = getDuracionMin(e);
-  const tKey = getTarifaKey(dur);
-  if(!tKey) return null;
-  const rates = pricing[tKey];
-  if(!rates) return null;
-  if('any' in rates) return { precio: rates.any, provincia: '', tarifaKey: tKey, rango:false };
-  const prov = getProvinciaEv(e);
-  if(prov) {
-    const p = rates[prov.toLowerCase()];
-    if(p != null) return { precio: p, provincia: prov, tarifaKey: tKey, rango:false };
+function formatTarifa(tKey) { return tKey === 90 ? '1h30' : (tKey === 120 ? '2h' : ''); }
+function getPrecio(ev, nombre) {
+  if (!nombre) return null;
+  const pricing = PRECIOS[normalize(nombre)];
+  if (!pricing || !ev._tarifaKey) return null;
+  const rates = pricing[ev._tarifaKey];
+  if (!rates) return null;
+  if ('any' in rates) return { precio: rates.any, provincia: '', tarifaKey: ev._tarifaKey, rango: false };
+  if (ev._prov) {
+    const p = rates[ev._prov.toLowerCase()];
+    if (p != null) return { precio: p, provincia: ev._prov, tarifaKey: ev._tarifaKey, rango: false };
   }
-  // Provincia desconocida para Mitxel/Jon: devolver rango min-max
   const vals = Object.values(rates);
-  return { precio: null, precioMin: Math.min(...vals), precioMax: Math.max(...vals), provincia: '?', tarifaKey: tKey, rango:true };
+  return { precio: null, precioMin: Math.min.apply(null, vals), precioMax: Math.max.apply(null, vals), provincia: '?', tarifaKey: ev._tarifaKey, rango: true };
 }
-// Devuelve el nombre activo del filtro de persona con tarifa (o '').
-// Aplica cuando el texto de animador o DJ identifica exactamente a una persona con tarifa.
-function getPersonaConTarifa() {
-  const fa = ($('fAnimador').value||'').trim();
-  const fd = ($('fDJ').value||'').trim();
-  // Sólo si uno de los dos está rellenado
-  const cand = (fa && !fd) ? fa : (fd && !fa ? fd : '');
-  if(!cand) return '';
-  // Buscar coincidencia exacta o única en la tabla de PRECIOS
-  const candN = normalize(cand);
-  const claves = Object.keys(PRECIOS);
-  // Match exacto
-  if(PRECIOS[candN]) return cand;
-  // Match por substring (sólo si exactamente 1 clave contiene el texto)
-  const matches = claves.filter(k => k.includes(candN) || candN.includes(k));
-  if(matches.length===1) {
-    // Devolver el nombre con la primera letra en mayúscula (visual)
-    return matches[0].charAt(0).toUpperCase() + matches[0].slice(1);
+
+// =====================================================================
+//  PREPARACIÓN DE DATOS (una sola vez, no en cada tecla)
+// =====================================================================
+const EVENTS = EVENTS_DATA.map(function (raw) {
+  const ev = Object.assign({}, raw);
+  ev._anims = animadoresDe(ev);
+  ev._djs = djsDe(ev);
+  ev._animsStr = ev._anims.join(' + ');
+  ev._djsStr = ev._djs.join(' + ');
+  ev._animsN = ev._anims.map(normalize);
+  ev._djsN = ev._djs.map(normalize);
+  ev._prov = provinciaDe(ev);
+  ev._dur = duracionMin(ev);
+  ev._tarifaKey = tarifaKeyDe(ev._dur);
+  ev._notas = limpiarNotas(ev.notas);
+  ev._lekua = lekuaDe(ev);
+  ev._pueblo = mostrarPueblo(ev.pueblo);
+  ev._calle = extractCalleYPueblo(ev.location || '', '').calle;
+  ev._sinAnimador = ev._anims.length === 0;
+  ev._blob = normalize([ev.pueblo, ev.animador, ev.dj, ev._notas, ev.titulo, ev.location, ev._animsStr, ev._djsStr].join(' '));
+  ev._mapsQ = encodeURIComponent(ev.location || ev.pueblo || '');
+  ev._mapsUrl = ev._mapsQ ? 'https://www.google.com/maps/dir/?api=1&destination=' + ev._mapsQ : '';
+  return ev;
+}).sort((a, b) => a.fecha.localeCompare(b.fecha) || (a.hora_inicio || '').localeCompare(b.hora_inicio || ''));
+
+let RESULTS = [];
+const STATE_KEY = 'diskofestas_state_v3';
+const S = { buscar: '', anim: '', dj: '', pueblo: '', desde: '', hasta: '', orden: 'fecha', pasados: false, soloSinAnim: false, atajo: '' };
+
+// =====================================================================
+//  ESTADO ↔ DOM
+// =====================================================================
+function leerDOM() {
+  S.buscar = $('fBuscar').value.trim();
+  S.anim = $('fAnimador').value.trim();
+  S.dj = $('fDJ').value.trim();
+  S.pueblo = $('fPueblo').value;
+  S.desde = $('fDesde').value;
+  S.hasta = $('fHasta').value;
+  S.orden = $('fOrden').value || 'fecha';
+}
+function escribirDOM() {
+  $('fBuscar').value = S.buscar;
+  $('fAnimador').value = S.anim;
+  $('fDJ').value = S.dj;
+  $('fPueblo').value = S.pueblo;
+  $('fDesde').value = S.desde;
+  $('fHasta').value = S.hasta;
+  $('fOrden').value = S.orden;
+  setSwitch($('tPasados'), S.pasados);
+  setSwitch($('tSinAnim'), S.soloSinAnim);
+  document.querySelectorAll('.date-chip').forEach(c => c.classList.toggle('active', c.dataset.shortcut === S.atajo));
+  $('btnClearSearch').classList.toggle('visible', !!S.buscar);
+}
+function setSwitch(el, on) { if (el) el.setAttribute('aria-checked', on ? 'true' : 'false'); }
+function guardarEstado() {
+  try { localStorage.setItem(STATE_KEY, JSON.stringify(S)); } catch (e) { /* modo privado */ }
+}
+function cargarEstado() {
+  try {
+    const raw = localStorage.getItem(STATE_KEY);
+    if (!raw) return;
+    const st = JSON.parse(raw);
+    Object.keys(S).forEach(k => { if (typeof st[k] === typeof S[k]) S[k] = st[k]; });
+    // Si el rango guardado se quedó en el pasado y no se ven pasados, se reajusta a hoy.
+    if (!S.pasados && S.desde && S.desde < hoyISO()) S.desde = hoyISO();
+    if (!S.pasados && S.hasta && S.hasta < hoyISO()) { S.hasta = ''; S.atajo = ''; }
+  } catch (e) { /* estado corrupto: se ignora */ }
+}
+
+// =====================================================================
+//  FILTRADO
+// =====================================================================
+function aplicar(guardar) {
+  const hoy = hoyISO();
+  const desde = S.desde || (S.pasados ? '' : hoy);
+  const hasta = S.hasta;
+  const buscarN = normalize(S.buscar);
+  const animN = normalize(S.anim);
+  const djN = normalize(S.dj);
+  const puebloN = normalize(S.pueblo);
+
+  RESULTS = EVENTS.filter(function (ev) {
+    if (desde && ev.fecha < desde) return false;
+    if (hasta && ev.fecha > hasta) return false;
+    if (S.soloSinAnim && !ev._sinAnimador) return false;
+    if (animN && !ev._animsN.some(a => a.includes(animN))) return false;
+    if (djN && !ev._djsN.some(d => d.includes(djN))) return false;
+    if (puebloN && normalize(ev._pueblo) !== puebloN) return false;
+    if (buscarN && !ev._blob.includes(buscarN)) return false;
+    return true;
+  });
+
+  const orden = S.orden;
+  RESULTS.sort(function (a, b) {
+    if (orden === 'fecha_desc') return b.fecha.localeCompare(a.fecha) || (b.hora_inicio || '').localeCompare(a.hora_inicio || '');
+    if (orden === 'animador') return (a._animsStr || '~').localeCompare(b._animsStr || '~', 'es') || a.fecha.localeCompare(b.fecha);
+    if (orden === 'pueblo') return (a._pueblo || '~').localeCompare(b._pueblo || '~', 'es') || a.fecha.localeCompare(b.fecha);
+    if (orden === 'dj') return (a._djsStr || '~').localeCompare(b._djsStr || '~', 'es') || a.fecha.localeCompare(b.fecha);
+    return a.fecha.localeCompare(b.fecha) || (a.hora_inicio || '').localeCompare(b.hora_inicio || '');
+  });
+
+  render();
+  if (guardar !== false) guardarEstado();
+}
+
+let debounceId = null;
+function aplicarDebounced() {
+  clearTimeout(debounceId);
+  debounceId = setTimeout(function () { leerDOM(); aplicar(); }, 160);
+}
+function aplicarYa() { leerDOM(); aplicar(); }
+
+function atajoFecha(key) {
+  const hoy = new Date();
+  let desde = new Date(hoy), hasta = null;
+  if (key === 'todo') {
+    S.desde = ''; S.hasta = ''; S.atajo = 'todo';
+    escribirDOM(); aplicar(); return;
   }
-  return '';
+  if (key === 'hoy') hasta = new Date(hoy);
+  else if (key === 'finde') {
+    const dow = hoy.getDay(); // 0 dom … 5 vie, 6 sáb
+    if (dow === 5 || dow === 6 || dow === 0) {
+      hasta = new Date(hoy);
+      hasta.setDate(hoy.getDate() + (dow === 5 ? 2 : dow === 6 ? 1 : 0));
+    } else {
+      desde.setDate(hoy.getDate() + (5 - dow));
+      hasta = new Date(desde);
+      hasta.setDate(desde.getDate() + 2);
+    }
+  } else if (key === 'mes') {
+    hasta = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+  } else if (key === 'd30') { hasta = new Date(hoy); hasta.setDate(hoy.getDate() + 30); }
+  else if (key === 'm3') { hasta = new Date(hoy); hasta.setMonth(hoy.getMonth() + 3); }
+  S.desde = isoDe(desde);
+  S.hasta = hasta ? isoDe(hasta) : '';
+  S.atajo = key;
+  escribirDOM();
+  aplicar();
 }
-function formatTarifa(tKey) { return tKey===90 ? '1h30' : (tKey===120 ? '2h' : ''); }
 
 function limpiarFiltros() {
-  $('fAnimador').value=''; $('fDJ').value='';
-  $('fPueblo').value=''; $('fDesde').value=hoyISO(); $('fHasta').value=''; $('fTexto').value='';
-  $('fOrden').value='fecha';
-  document.querySelectorAll('.date-chip.active').forEach(c=>c.classList.remove('active'));
-  applyFilters();
-}
-function isUpcoming(fechaIso) {
-  // True si la fecha está entre hoy y hoy+7 (incluido)
-  const d = toDate(fechaIso); if(!d) return false;
-  const hoy = new Date(); hoy.setHours(0,0,0,0);
-  const lim = new Date(hoy); lim.setDate(hoy.getDate()+7);
-  return d >= hoy && d <= lim;
-}
-function nombreMes(iso) {
-  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const d = toDate(iso); if(!d) return '';
-  return meses[d.getMonth()] + ' ' + d.getFullYear();
-}
-function claveMes(iso) {
-  const d = toDate(iso); if(!d) return '';
-  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
-}
-function escapeHtml(s) { return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function renderResults() {
-  const cont=$('results'); $('resultCount').textContent=CURRENT_RESULTS.length;
-  const persona = getPersonaConTarifa();
-  // Totales
-  let totalExacto = 0, totalRangoMin = 0, totalRangoMax = 0, conPrecio = 0, sinProv = 0, sinTarifa = 0;
-  const precios = CURRENT_RESULTS.map(e => persona ? getPrecio(e, persona) : null);
-  precios.forEach(p => {
-    if(!p) { sinTarifa++; return; }
-    conPrecio++;
-    if(p.rango) { totalRangoMin += p.precioMin; totalRangoMax += p.precioMax; sinProv++; }
-    else { totalExacto += p.precio; totalRangoMin += p.precio; totalRangoMax += p.precio; }
-  });
-  const ptEl = $('precioTotal');
-  if(persona && conPrecio > 0) {
-    ptEl.style.display = 'flex';
-    $('pTPersona').textContent = '— ' + persona;
-    const valor = (totalRangoMin === totalRangoMax)
-      ? `${totalRangoMin} €`
-      : `${totalRangoMin}–${totalRangoMax} €`;
-    $('pTValor').textContent = valor;
-    const partes = [`${conPrecio} disko${conPrecio===1?'':'s'} con tarifa`];
-    if(sinTarifa) partes.push(`${sinTarifa} sin tarifa aplicable (duración ≠ 1h30/2h)`);
-    if(sinProv) partes.push(`${sinProv} con provincia desconocida → rango`);
-    $('pTDetalle').textContent = partes.join(' · ');
-  } else {
-    ptEl.style.display = 'none';
-  }
-  if(!CURRENT_RESULTS.length){ cont.innerHTML='<div class="empty"><div class="icon">\uD83D\uDD0D</div><p>Sin resultados con estos filtros</p></div>'; return; }
-  // Determinar si agrupamos por mes (sólo cuando se ordena por fecha; en otros órdenes la agrupación no tiene sentido)
-  const orden = $('fOrden').value || 'fecha';
-  const agrupar = (orden==='fecha' || orden==='fecha_desc');
-  // Conteo por mes para la cabecera
-  const conteoMes = {};
-  if(agrupar) CURRENT_RESULTS.forEach(e => { const k = claveMes(e.fecha); conteoMes[k] = (conteoMes[k]||0) + 1; });
-  let html = '';
-  let mesActual = null;
-  CURRENT_RESULTS.forEach((e,idx)=>{
-    if(agrupar) {
-      const k = claveMes(e.fecha);
-      if(k !== mesActual) {
-        mesActual = k;
-        html += `<div class="month-header"><span>\uD83D\uDDD3\uFE0F ${nombreMes(e.fecha)}</span><span class="mh-count">${conteoMes[k]} disko${conteoMes[k]===1?'':'s'}</span></div>`;
-      }
-    }
-    const anims=animadoresDe(e), djs=djsDe(e);
-    const chipsAnim=anims.map(a=>`<span class="chip">\uD83D\uDC64 ${escapeHtml(a)}</span>`).join('');
-    const chipsDj=djs.map(d=>`<span class="chip dj">\uD83C\uDFA7 ${escapeHtml(d)}</span>`).join('');
-    const mapsQuery = encodeURIComponent(e.location || e.pueblo || '');
-    const mapsUrl = mapsQuery ? `https://www.google.com/maps/dir/?api=1&destination=${mapsQuery}` : '';
-    const mapsLabel = e.location ? escapeHtml(e.location) : escapeHtml(e.pueblo || '');
-    const chipLugar = mapsUrl ? `<a class="chip lugar" href="${mapsUrl}" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer;">\uD83D\uDCCD ${mapsLabel} \uD83D\uDDFA\uFE0F</a>` : '';
-    const chipUpcoming = isUpcoming(e.fecha) ? '<span class="chip upcoming">\uD83D\uDD25 Esta semana</span>' : '';
-    let chipPrecio = '';
-    const p = precios[idx];
-    if(p) {
-      const tarifa = formatTarifa(p.tarifaKey);
-      if(p.rango) {
-        chipPrecio = `<span class="chip precio noprov" title="Provincia desconocida">\uD83D\uDCB6 ${p.precioMin}–${p.precioMax}€ · ${tarifa} · prov.?</span>`;
-      } else {
-        const provTxt = p.provincia ? ` · ${p.provincia}` : '';
-        chipPrecio = `<span class="chip precio">\uD83D\uDCB6 ${p.precio}€ · ${tarifa}${provTxt}</span>`;
-      }
-    }
-    const horaInicio = e.hora_inicio || '';
-    const horaFinal  = e.hora_final  || '';
-    const notas = e.notas ? e.notas.replace(/\[Original:.*?\]/g,'').replace(/Ubicacion:[^|]*/g,'').replace(/\|\s*\|/g,'|').replace(/^\s*\|\s*|\s*\|\s*$/g,'').trim() : '';
-    const notasHtml = notas ? `<div class="notas-visible">\uD83D\uDCDD ${escapeHtml(notas)}</div>` : '';
-    const upcomingClass = isUpcoming(e.fecha) ? ' upcoming' : '';
-    html += `<div class="event-card${upcomingClass}" data-idx="${idx}">
-      <div class="date-row">
-        <span class="fecha">\uD83D\uDCC5 ${formatFecha(e.fecha)}</span>
-        <span class="hora">\uD83D\uDD50 ${horaInicio}${horaFinal ? ' – ' + horaFinal : ''}</span>
-      </div>
-      <div class="pueblo">\uD83C\uDFD8\uFE0F ${escapeHtml(e.pueblo||'(sin pueblo)')}</div>
-      <div class="people">${chipUpcoming}${chipsAnim}${chipsDj}${chipPrecio}${chipLugar}</div>
-      ${notasHtml}
-    </div>`;
-  });
-  cont.innerHTML = html;
-  cont.querySelectorAll('.event-card').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('expanded')));
-}
-const SHORT_URL_CACHE = new Map();
-async function shortenUrl(longUrl) {
-  if(!longUrl) return longUrl;
-  if(SHORT_URL_CACHE.has(longUrl)) return SHORT_URL_CACHE.get(longUrl);
-  try {
-    const r = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(longUrl), {signal: AbortSignal.timeout(4000)});
-    if(r.ok){ const short = (await r.text()).trim(); if(short.startsWith('http')){ SHORT_URL_CACHE.set(longUrl, short); return short; } }
-  } catch(e){}
-  return longUrl;
+  S.buscar = ''; S.anim = ''; S.dj = ''; S.pueblo = '';
+  S.desde = hoyISO(); S.hasta = ''; S.orden = 'fecha';
+  S.pasados = false; S.soloSinAnim = false; S.atajo = '';
+  escribirDOM();
+  poblarListas();
+  aplicar();
+  toast('Filtros limpiados');
 }
 
-// ===== Compartir por WhatsApp con selector de modo (W1, W2, W3, W4) =====
-function openShareModal() {
-  const n = CURRENT_RESULTS.length;
-  if(!n){ alert('No hay resultados para compartir.'); return; }
-  const modal = $('shareModal');
-  ensureModeButtons();
-  $('shareModalSub').textContent = n + ' evento' + (n===1?'':'s') + ' a compartir.';
-  modal.classList.add('visible');
+// Persona con tarifa activa (solo si animador o DJ identifica a UNA sola persona tarifada)
+function personaConTarifa() {
+  const fa = S.anim, fd = S.dj;
+  const cand = (fa && !fd) ? fa : (fd && !fa ? fd : '');
+  if (!cand) return '';
+  const candN = normalize(cand);
+  if (PRECIOS[candN]) return cand;
+  const matches = Object.keys(PRECIOS).filter(k => k.includes(candN) || candN.includes(k));
+  if (matches.length === 1) return matches[0].charAt(0).toUpperCase() + matches[0].slice(1);
+  return '';
 }
-function ensureModeButtons() {
-  const card = $('shareModalCard');
-  // Si ya tiene los botones (estado inicial o tras reabrir), sólo (re)conectamos los handlers
-  if(card.querySelector('.mode-btn')) {
-    card.querySelectorAll('.mode-btn').forEach(b=>{
-      b.onclick = () => shareWithMode(b.dataset.mode);
-    });
-    return;
+
+// =====================================================================
+//  LISTAS DESPLEGABLES
+// =====================================================================
+function poblarListas() {
+  const hoy = hoyISO();
+  const origen = S.pasados ? EVENTS : EVENTS.filter(e => e.fecha >= hoy);
+  // Se deduplica por nombre normalizado: "Sope" y "sope" son el mismo sitio.
+  const anim = new Map(), dj = new Map(), pue = new Map();
+  origen.forEach(function (e) {
+    e._anims.forEach(a => { const k = normalize(a); if (k && !anim.has(k)) anim.set(k, a); });
+    e._djs.forEach(d => { const k = normalize(d); if (k && !dj.has(k)) dj.set(k, d); });
+    const k = normalize(e._pueblo);
+    if (k && !pue.has(k)) pue.set(k, e._pueblo);
+  });
+  const pueblos = [...pue.values()].sort((a, b) => a.localeCompare(b, 'es'));
+  const sel = $('fPueblo');
+  const actual = normalize(S.pueblo);
+  sel.innerHTML = '<option value="">Todos</option>' + pueblos.map(p => '<option value="' + escapeHtml(p) + '">' + escapeHtml(p) + '</option>').join('');
+  if (actual && pue.has(actual)) { S.pueblo = pue.get(actual); sel.value = S.pueblo; }
+  else { sel.value = ''; S.pueblo = ''; }
+  rellenarDatalist('dlAnimador', [...anim.values()].sort((a, b) => a.localeCompare(b, 'es')));
+  rellenarDatalist('dlDJ', [...dj.values()].sort((a, b) => a.localeCompare(b, 'es')));
+}
+function rellenarDatalist(id, items) {
+  const dl = $(id); if (!dl) return;
+  dl.innerHTML = items.map(v => '<option value="' + escapeHtml(v) + '"></option>').join('');
+}
+
+// =====================================================================
+//  RENDER
+// =====================================================================
+const ATAJO_LABEL = { hoy: 'Hoy', finde: 'Próx. finde', mes: 'Este mes', d30: '30 días', m3: '3 meses', todo: 'Todo' };
+
+function chipsFiltrosActivos() {
+  const cont = $('activeFilters');
+  const chips = [];
+  const add = (campo, texto) => chips.push('<button type="button" class="af-chip" data-quitar="' + campo + '">' + escapeHtml(texto) + '<span class="x" aria-hidden="true">&times;</span><span class="sr-only">Quitar filtro</span></button>');
+  if (S.buscar) add('buscar', '🔍 ' + S.buscar);
+  if (S.anim) add('anim', '👤 ' + S.anim);
+  if (S.dj) add('dj', '🎧 ' + S.dj);
+  if (S.pueblo) add('pueblo', '🏘️ ' + S.pueblo);
+  if (S.soloSinAnim) add('soloSinAnim', '⚠️ Sin animador');
+  if (S.pasados) add('pasados', '⏪ Con pasadas');
+  // El rango por defecto (desde hoy, sin fin) no se muestra: es el estado normal.
+  const rangoPorDefecto = !S.atajo && !S.hasta && (S.desde === hoyISO() || (!S.desde && !S.pasados));
+  if (S.atajo && ATAJO_LABEL[S.atajo]) add('fechas', '📅 ' + ATAJO_LABEL[S.atajo]);
+  else if ((S.desde || S.hasta) && !rangoPorDefecto) {
+    let t = '📅 ';
+    if (S.desde && S.hasta) t += formatFechaCorta(S.desde) + ' – ' + formatFechaCorta(S.hasta);
+    else if (S.desde) t += 'desde ' + formatFechaCorta(S.desde);
+    else t += 'hasta ' + formatFechaCorta(S.hasta);
+    add('fechas', t);
   }
-  card.innerHTML = '<h3>\uD83D\uDCE4 ¿Cómo quieres compartir?</h3>'
-    + '<div class="sub" id="shareModalSub">Elige el formato del mensaje de WhatsApp.</div>'
-    + '<button type="button" class="mode-btn" data-mode="detallado">'
-    +   '<span class="mode-icon">\uD83D\uDCCB</span>'
-    +   '<div><div class="mode-title">Detallado</div><div class="mode-desc">Toda la info de cada disko: lekua, ordutegia, animador, DJ, prezioa, kontaktua, oharrak.</div></div>'
-    + '</button>'
-    + '<button type="button" class="mode-btn" data-mode="bezeroa">'
-    +   '<span class="mode-icon">\uD83E\uDD1D</span>'
-    +   '<div><div class="mode-title">Bezeroa (euskaraz)</div><div class="mode-desc">Bezeroari bidaltzeko: dena euskaraz, data urtea/hilabetea/eguna formatuan, diskofesta.eus marka.</div></div>'
-    + '</button>'
-    + '<button type="button" class="mode-btn" data-mode="compacto">'
-    +   '<span class="mode-icon">\uD83D\uDCC4</span>'
-    +   '<div><div class="mode-title">Compacto (por mes)</div><div class="mode-desc">Una línea por evento, agrupado por mes. Ideal para agendas largas.</div></div>'
-    + '</button>'
-    + '<button type="button" class="mode-btn" data-mode="por_animador">'
-    +   '<span class="mode-icon">\uD83D\uDC64</span>'
-    +   '<div><div class="mode-title">Agrupado por animador</div><div class="mode-desc">Cada animador con sus diskos en orden de fecha.</div></div>'
-    + '</button>'
-    + '<button type="button" class="modal-cancel" onclick="closeShareModal()">Cancelar</button>';
-  card.querySelectorAll('.mode-btn').forEach(b=>{
-    b.addEventListener('click', () => shareWithMode(b.dataset.mode));
+  if (S.orden !== 'fecha') {
+    const txt = { fecha_desc: 'Lejanos primero', animador: 'Por animador', pueblo: 'Por pueblo', dj: 'Por DJ' }[S.orden] || S.orden;
+    add('orden', '↕️ ' + txt);
+  }
+  if (chips.length > 1) chips.push('<button type="button" class="af-chip clear-all" data-quitar="todo">Limpiar todo</button>');
+  cont.innerHTML = chips.join('');
+}
+
+function tarjeta(ev, precio, hoy) {
+  const esPasado = ev.fecha < hoy;
+  const clases = ['event-card'];
+  if (esPasado) clases.push('past');
+  else if (ev._sinAnimador) clases.push('sin-animador');
+  else if (esEstaSemana(ev.fecha)) clases.push('upcoming');
+
+  let chips = '';
+  if (!esPasado && esEstaSemana(ev.fecha)) chips += '<span class="chip upcoming">🔥 Esta semana</span>';
+  if (esPasado) chips += '<span class="chip pasado">⏪ Pasada</span>';
+  if (ev._sinAnimador && !esPasado) chips += '<span class="chip alerta">⚠️ Sin animador</span>';
+  chips += ev._anims.map(a => '<span class="chip">👤 ' + escapeHtml(a) + '</span>').join('');
+  chips += ev._djs.map(d => '<span class="chip dj">🎧 ' + escapeHtml(d) + '</span>').join('');
+  if (precio) {
+    chips += precio.rango
+      ? '<span class="chip precio noprov" title="Provincia desconocida">💶 ' + precio.precioMin + '–' + precio.precioMax + '€ · ' + formatTarifa(precio.tarifaKey) + ' · prov.?</span>'
+      : '<span class="chip precio">💶 ' + precio.precio + '€ · ' + formatTarifa(precio.tarifaKey) + (precio.provincia ? ' · ' + precio.provincia : '') + '</span>';
+  }
+  if (ev._mapsUrl) {
+    const etiqueta = ev._calle || ev._pueblo || 'Cómo llegar';
+    chips += '<a class="chip lugar" href="' + ev._mapsUrl + '" target="_blank" rel="noopener" title="' +
+      escapeHtml(ev.location || ev._pueblo) + '">📍 ' + escapeHtml(etiqueta) + ' 🗺️</a>';
+  }
+
+  const muntaia = ev.hora_inicio ? addMinutes(ev.hora_inicio, -90) : '';
+  const detalles = [];
+  if (muntaia) detalles.push('<div>🛠️ <b>Muntaia:</b> ' + muntaia + ' (1h30 antes)</div>');
+  if (ev._dur) detalles.push('<div>⏱️ <b>Duración:</b> ' + Math.floor(ev._dur / 60) + 'h' + (ev._dur % 60 ? pad2(ev._dur % 60) : '') + (ev._prov ? ' · ' + ev._prov : '') + '</div>');
+  if (ev._lekua) detalles.push('<div>📍 <b>Lekua:</b> ' + escapeHtml(ev._lekua) + '</div>');
+  detalles.push('<div>📞 <b>Kontaktua:</b> <a href="tel:' + escapeHtml(getKontaktua(ev).replace(/\s/g, '')) + '">' + escapeHtml(getKontaktua(ev)) + '</a></div>');
+  detalles.push('<div>🚐 <b>Furgoneta:</b> ' + escapeHtml(getAparkatzeko(ev)) + '</div>');
+  if (ev.titulo) detalles.push('<div>🗓️ <b>Calendar:</b> ' + escapeHtml(ev.titulo) + '</div>');
+
+  return '<article class="' + clases.join(' ') + '">' +
+    '<div class="date-row"><span class="fecha">📅 ' + formatFecha(ev.fecha) + '</span>' +
+    '<span class="hora">🕐 ' + escapeHtml(formatHorario(ev.hora_inicio, ev.hora_final) || 'sin hora') + '</span></div>' +
+    '<div class="pueblo">🏘️ ' + escapeHtml(ev._pueblo || '(sin pueblo)') + '</div>' +
+    '<div class="people">' + chips + '</div>' +
+    (ev._notas ? '<div class="notas-visible">📝 ' + escapeHtml(ev._notas) + '</div>' : '') +
+    '<button type="button" class="expand-btn" data-expand="1" aria-expanded="false">Ver detalles <span class="caret" aria-hidden="true">▼</span></button>' +
+    '<div class="detalles">' + detalles.join('') + '</div>' +
+    '</article>';
+}
+
+function esEstaSemana(fechaIso) {
+  const d = toDate(fechaIso); if (!d) return false;
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  const lim = new Date(hoy); lim.setDate(hoy.getDate() + 7);
+  return d >= hoy && d <= lim;
+}
+
+function render() {
+  const hoy = hoyISO();
+  const cont = $('results');
+  $('resultCount').textContent = RESULTS.length;
+  chipsFiltrosActivos();
+
+  // Aviso global de diskos futuras sin animador
+  const sinAnimFuturas = EVENTS.filter(e => e.fecha >= hoy && e._sinAnimador).length;
+  const wb = $('warnSinAnim');
+  if (sinAnimFuturas > 0 && !S.soloSinAnim) {
+    $('warnSinAnimTxt').innerHTML = '⚠️ Hay <b>' + plural(sinAnimFuturas, 'disko próxima', 'diskos próximas') + '</b> sin animador asignado.';
+    wb.classList.add('visible');
+  } else { wb.classList.remove('visible'); }
+
+  // Totales de tarifa
+  const persona = personaConTarifa();
+  const precios = RESULTS.map(e => persona ? getPrecio(e, persona) : null);
+  let min = 0, max = 0, conPrecio = 0, sinProv = 0, sinTarifa = 0;
+  precios.forEach(function (p) {
+    if (!p) { sinTarifa++; return; }
+    conPrecio++;
+    if (p.rango) { min += p.precioMin; max += p.precioMax; sinProv++; }
+    else { min += p.precio; max += p.precio; }
   });
+  const pt = $('precioTotal');
+  if (persona && conPrecio > 0) {
+    pt.classList.add('visible');
+    $('pTPersona').textContent = '— ' + persona;
+    $('pTValor').textContent = (min === max) ? min + ' €' : min + '–' + max + ' €';
+    const partes = [plural(conPrecio, 'disko con tarifa', 'diskos con tarifa')];
+    if (sinTarifa) partes.push(sinTarifa + ' sin tarifa (duración ≠ 1h30/2h)');
+    if (sinProv) partes.push(sinProv + ' con provincia desconocida → rango');
+    $('pTDetalle').textContent = partes.join(' · ');
+  } else { pt.classList.remove('visible'); }
+
+  // Botón compartir
+  const fab = $('btnShare');
+  fab.disabled = RESULTS.length === 0;
+  $('shareLabel').textContent = RESULTS.length ? 'Compartir ' + RESULTS.length + ' por WhatsApp' : 'Nada que compartir';
+
+  if (!RESULTS.length) { cont.innerHTML = estadoVacio(); return; }
+
+  const agrupar = (S.orden === 'fecha' || S.orden === 'fecha_desc');
+  const conteoMes = {};
+  if (agrupar) RESULTS.forEach(e => { const k = claveMes(e.fecha); conteoMes[k] = (conteoMes[k] || 0) + 1; });
+
+  let html = '', mesActual = null;
+  for (let i = 0; i < RESULTS.length; i++) {
+    const ev = RESULTS[i];
+    if (agrupar) {
+      const k = claveMes(ev.fecha);
+      if (k !== mesActual) {
+        mesActual = k;
+        html += '<div class="month-header"><span>🗓️ ' + nombreMes(ev.fecha) + '</span><span class="mh-count">' + plural(conteoMes[k], 'disko', 'diskos') + '</span></div>';
+      }
+    }
+    html += tarjeta(ev, precios[i], hoy);
+  }
+  cont.innerHTML = html;
 }
-function closeShareModal() { $('shareModal').classList.remove('visible'); }
-function showShareLoading(mode) {
-  const card = $('shareModalCard');
-  const labels = { detallado:'detallado', compacto:'compacto', por_animador:'por animador', bezeroa:'bezeroa (euskaraz)' };
-  const label = labels[mode] || mode;
-  card.innerHTML = '<div class="loading"><span class="spin"></span>Preparando mensaje (' + label + ')…</div>';
+
+function estadoVacio() {
+  const hoy = hoyISO();
+  const futuras = EVENTS.filter(e => e.fecha >= hoy).length;
+  const hayFiltros = !!(S.buscar || S.anim || S.dj || S.pueblo || S.soloSinAnim || S.hasta || (S.desde && S.desde !== hoy));
+  let titulo, texto, acciones = '';
+  if (futuras === 0 && !S.pasados) {
+    titulo = 'No hay diskos próximas en la agenda';
+    texto = 'El calendario no tiene ninguna disko a partir de hoy. Sincroniza de nuevo desde Google Calendar o consulta el histórico.';
+    acciones = '<button type="button" data-accion="pasados">⏪ Ver diskos pasadas</button>';
+  } else if (hayFiltros) {
+    titulo = 'Sin resultados con estos filtros';
+    texto = 'Hay ' + plural(futuras, 'disko próxima', 'diskos próximas') + ' en la agenda, pero ninguna encaja con lo que has filtrado.';
+    acciones = '<button type="button" data-accion="limpiar">↺ Limpiar filtros</button>' +
+               (S.pasados ? '' : '<button type="button" class="sec" data-accion="pasados">⏪ Buscar también en pasadas</button>');
+  } else {
+    titulo = 'Nada por aquí';
+    texto = 'No hay diskos en el rango de fechas seleccionado.';
+    acciones = '<button type="button" data-accion="todo">📅 Ver todas las próximas</button>';
+  }
+  return '<div class="empty"><div class="icon" aria-hidden="true">🔍</div><h3>' + titulo + '</h3><p>' + texto + '</p><div class="acciones">' + acciones + '</div></div>';
 }
-function buildResumen(events) {
+
+// =====================================================================
+//  COMPARTIR POR WHATSAPP
+// =====================================================================
+const SHORT_CACHE = new Map();
+const MAX_SHORTEN = 40;   // por encima de esto no merece la pena acortar (lentitud y límites de TinyURL)
+const AVISO_LARGO = 6000; // caracteres a partir de los cuales WhatsApp puede truncar
+
+async function acortar(url) {
+  if (!url) return url;
+  if (SHORT_CACHE.has(url)) return SHORT_CACHE.get(url);
+  try {
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), 4500);
+    const r = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(url), { signal: ctl.signal });
+    clearTimeout(t);
+    if (r.ok) {
+      const s = (await r.text()).trim();
+      if (s.indexOf('http') === 0) { SHORT_CACHE.set(url, s); return s; }
+    }
+  } catch (e) { /* sin red o bloqueado: se usa la URL larga */ }
+  SHORT_CACHE.set(url, url);
+  return url;
+}
+async function mapasDeResultados() {
+  // Dedupe: muchos eventos comparten ubicación
+  const unicos = [...new Set(RESULTS.map(e => e._mapsUrl).filter(Boolean))];
+  const mapa = new Map();
+  if (unicos.length && unicos.length <= MAX_SHORTEN) {
+    const cortos = await Promise.all(unicos.map(acortar));
+    unicos.forEach((u, i) => mapa.set(u, cortos[i]));
+  } else {
+    unicos.forEach(u => mapa.set(u, u));
+  }
+  return RESULTS.map(e => e._mapsUrl ? mapa.get(e._mapsUrl) : null);
+}
+
+function resumen(events, euskaraz) {
   const pueblos = new Set();
-  let primera=null, ultima=null;
-  events.forEach(e=>{
-    if(e.pueblo) pueblos.add(e.pueblo);
-    if(!primera||e.fecha<primera) primera=e.fecha;
-    if(!ultima||e.fecha>ultima) ultima=e.fecha;
+  let primera = null, ultima = null;
+  events.forEach(function (e) {
+    if (e._pueblo) pueblos.add(e._pueblo);
+    if (!primera || e.fecha < primera) primera = e.fecha;
+    if (!ultima || e.fecha > ultima) ultima = e.fecha;
   });
-  let res = '\uD83D\uDCC5 ' + events.length + ' disko' + (events.length===1?'':'s');
-  if(pueblos.size) res += ' · ' + pueblos.size + ' pueblo' + (pueblos.size===1?'':'s');
-  if(primera && ultima) {
-    if(primera===ultima) res += ' · ' + formatFechaCorta(primera);
-    else res += ' · Del ' + formatFechaCorta(primera) + ' al ' + formatFechaCorta(ultima);
+  const fmt = euskaraz ? formatFechaSlash : formatFechaCorta;
+  let res = '📅 ' + events.length + ' disko';
+  if (!euskaraz && events.length !== 1) res += 's';
+  if (pueblos.size) res += ' · ' + pueblos.size + ' ' + (euskaraz ? 'herri' : (pueblos.size === 1 ? 'pueblo' : 'pueblos'));
+  if (primera && ultima) {
+    if (primera === ultima) res += ' · ' + fmt(primera);
+    else res += euskaraz ? ' · ' + fmt(primera) + ' – ' + fmt(ultima) : ' · Del ' + fmt(primera) + ' al ' + fmt(ultima);
   }
   return res;
 }
-function describirFiltros() {
-  const fa = $('fAnimador').value.trim();
-  const fd = $('fDJ').value.trim();
-  const fp = $('fPueblo').value.trim();
-  const fD = $('fDesde').value, fH = $('fHasta').value, fT = $('fTexto').value.trim();
+function describirFiltros(euskaraz) {
+  const L = euskaraz
+    ? { buscar: 'Bilaketa', anim: 'Animatzailea', dj: 'DJ', pueblo: 'Herria', desde: 'Noiztik', hasta: 'Noiz arte' }
+    : { buscar: 'Búsqueda', anim: 'Animador', dj: 'DJ', pueblo: 'Bezeroa', desde: 'Desde', hasta: 'Hasta' };
   const arr = [];
-  if(fa) arr.push('Animador: ' + fa);
-  if(fd) arr.push('DJ: ' + fd);
-  if(fp) arr.push('Bezeroa: ' + fp);
-  if(fD) arr.push('Desde: ' + fD);
-  if(fH) arr.push('Hasta: ' + fH);
-  if(fT) arr.push('Texto: ' + fT);
+  if (S.buscar) arr.push(L.buscar + ': ' + S.buscar);
+  if (S.anim) arr.push(L.anim + ': ' + S.anim);
+  if (S.dj) arr.push(L.dj + ': ' + S.dj);
+  if (S.pueblo) arr.push(L.pueblo + ': ' + S.pueblo);
+  if (!euskaraz) {
+    if (S.desde) arr.push(L.desde + ': ' + formatFechaCorta(S.desde));
+    if (S.hasta) arr.push(L.hasta + ': ' + formatFechaCorta(S.hasta));
+  }
   return arr;
 }
-async function shareWithMode(mode) {
-  showShareLoading(mode);
-  let msg;
-  try {
-    if(mode==='detallado')           msg = await buildMsgDetallado();
-    else if(mode==='bezeroa')        msg = await buildMsgBezeroa();
-    else if(mode==='compacto')       msg = buildMsgCompacto();
-    else                             msg = buildMsgPorAnimador();
-  } catch(err) {
-    alert('Error preparando el mensaje: ' + (err && err.message || err));
-    closeShareModal();
-    return;
-  }
-  closeShareModal();
-  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(msg);
-  window.open(waUrl, '_blank');
-}
-async function buildMsgDetallado() {
-  const lines = ['\uD83C\uDF89 *Diskofestas - Arima Cool Tour*', buildResumen(CURRENT_RESULTS)];
-  const filtros = describirFiltros();
-  if(filtros.length) lines.push('\uD83D\uDD0D Filtros: ' + filtros.join(' | '));
-  const persona = getPersonaConTarifa();
-  // Pre-acortar URLs de Maps en paralelo (W4)
-  const mapTasks = CURRENT_RESULTS.map(e => {
-    const q = encodeURIComponent(e.location || e.pueblo || '');
-    if(!q) return Promise.resolve(null);
-    return shortenUrl('https://www.google.com/maps/dir/?api=1&destination=' + q);
-  });
-  const mapsUrls = await Promise.all(mapTasks);
-  CURRENT_RESULTS.forEach(function(e, idx) {
-    const anims = animadoresDe(e).join(' + ') || '';
-    const djs   = djsDe(e).join(' + ') || '';
-    lines.push('');
-    lines.push('\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500');
-    lines.push('\uD83D\uDCC5 *' + formatFechaCorta(e.fecha) + '*' + (e.pueblo ? ' \u2022 ' + e.pueblo : ''));
-    const hi = e.hora_inicio || '';
-    const hf = e.hora_final  || '';
-    if(hi || hf) {
-      let hLine = '\uD83D\uDD50 Ordutegia: ';
-      if(hi && hf) hLine += hi + ' \u2013 ' + hf;
-      else hLine += (hi || hf);
-      lines.push(hLine);
-    }
-    const lekua = getLekua(e);
-    if(lekua && lekua !== 'Por confirmar') lines.push('\uD83D\uDCCD Lekua: ' + lekua);
-    else if(e.location) lines.push('\uD83D\uDCCD Lekua: ' + e.location);
-    if(mapsUrls[idx]) lines.push('\uD83D\uDDFA\uFE0F Mapa: ' + mapsUrls[idx]);
-    if(anims) lines.push('\uD83D\uDC64 Animatzailea: ' + anims);
-    if(djs)   lines.push('\uD83C\uDFA7 DJ: ' + djs);
-    if(persona) {
+
+async function msgDetallado() {
+  const lines = ['🎉 *Diskofestas - Arima Cool Tour*', resumen(RESULTS, false)];
+  const f = describirFiltros(false);
+  if (f.length) lines.push('🔍 Filtros: ' + f.join(' | '));
+  const persona = personaConTarifa();
+  const mapas = await mapasDeResultados();
+  RESULTS.forEach(function (e, i) {
+    lines.push('', '────────────');
+    lines.push('📅 *' + formatFechaCorta(e.fecha) + '*' + (e._pueblo ? ' • ' + e._pueblo : ''));
+    const h = formatHorario(e.hora_inicio, e.hora_final);
+    if (h) lines.push('🕐 Ordutegia: ' + h.replace('–', ' – '));
+    if (e.hora_inicio) { const m = addMinutes(e.hora_inicio, -90); if (m) lines.push('🛠️ Muntaia: ' + m); }
+    if (e._lekua) lines.push('📍 Lekua: ' + e._lekua);
+    if (mapas[i]) lines.push('🗺️ Mapa: ' + mapas[i]);
+    if (e._animsStr) lines.push('👤 Animatzailea: ' + e._animsStr);
+    else lines.push('⚠️ Animatzailerik gabe');
+    if (e._djsStr) lines.push('🎧 DJ: ' + e._djsStr);
+    if (persona) {
       const p = getPrecio(e, persona);
-      if(p) {
-        if(p.rango) lines.push('\uD83D\uDCB6 Prezioa: ' + p.precioMin + '\u2013' + p.precioMax + '\u20AC (' + formatTarifa(p.tarifaKey) + ', prov.?)');
-        else        lines.push('\uD83D\uDCB6 Prezioa: ' + p.precio + '\u20AC (' + formatTarifa(p.tarifaKey) + (p.provincia?(', '+p.provincia):'') + ')');
-      }
+      if (p) lines.push('💶 Prezioa: ' + (p.rango
+        ? p.precioMin + '–' + p.precioMax + '€ (' + formatTarifa(p.tarifaKey) + ', prov.?)'
+        : p.precio + '€ (' + formatTarifa(p.tarifaKey) + (p.provincia ? ', ' + p.provincia : '') + ')'));
     }
-    lines.push('\uD83D\uDCDE Kontaktua: ' + getKontaktua(e));
+    lines.push('🚐 Furgoneta: ' + getAparkatzeko(e));
+    lines.push('📞 Kontaktua: ' + getKontaktua(e));
+    if (e._notas) lines.push('📝 Oharrak: ' + e._notas);
   });
   return lines.join('\n');
 }
-// ===== Modo BEZEROA: euskaraz, data urtea/hilabetea/eguna, diskofesta.eus =====
-async function buildMsgBezeroa() {
-  // Cabecera con la marca diskofesta.eus en lugar de Arima Cool Tour
-  const n = CURRENT_RESULTS.length;
-  const pueblos = new Set();
-  let primera=null, ultima=null;
-  CURRENT_RESULTS.forEach(e=>{
-    if(e.pueblo) pueblos.add(e.pueblo);
-    if(!primera||e.fecha<primera) primera=e.fecha;
-    if(!ultima||e.fecha>ultima) ultima=e.fecha;
-  });
-  let resumen = '\uD83D\uDCC5 ' + n + ' disko';
-  if(pueblos.size) resumen += ' \u00B7 ' + pueblos.size + ' herri';
-  if(primera && ultima) {
-    if(primera===ultima) resumen += ' \u00B7 ' + formatFechaSlash(primera);
-    else resumen += ' \u00B7 ' + formatFechaSlash(primera) + ' \u2013 ' + formatFechaSlash(ultima);
-  }
-  const lines = ['\uD83C\uDF89 *diskofesta.eus*', resumen];
-  // Iragazkiak (filtros) en euskera
-  const fa = $('fAnimador').value.trim();
-  const fd = $('fDJ').value.trim();
-  const fp = $('fPueblo').value.trim();
-  const fT = $('fTexto').value.trim();
-  const filtros = [];
-  if(fa) filtros.push('Animatzailea: ' + fa);
-  if(fd) filtros.push('DJ: ' + fd);
-  if(fp) filtros.push('Herria: ' + fp);
-  if(fT) filtros.push('Testua: ' + fT);
-  if(filtros.length) lines.push('\uD83D\uDD0D Iragazkiak: ' + filtros.join(' | '));
-  const persona = getPersonaConTarifa();
-  // Pre-acortar URLs de Maps
-  const mapTasks = CURRENT_RESULTS.map(e => {
-    const q = encodeURIComponent(e.location || e.pueblo || '');
-    if(!q) return Promise.resolve(null);
-    return shortenUrl('https://www.google.com/maps/dir/?api=1&destination=' + q);
-  });
-  const mapsUrls = await Promise.all(mapTasks);
-  CURRENT_RESULTS.forEach(function(e, idx) {
-    const anims = animadoresDe(e).join(' + ') || '';
-    const djs   = djsDe(e).join(' + ') || '';
-    lines.push('');
-    lines.push('\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500');
-    lines.push('\uD83D\uDCC5 *' + formatFechaSlash(e.fecha) + '*' + (e.pueblo ? ' \u2022 ' + e.pueblo : ''));
-    const horario = formatHorario(e.hora_inicio, e.hora_final);
-    if(horario) lines.push('\uD83D\uDD50 Ordutegia: ' + horario);
-    const lekua = getLekua(e);
-    if(lekua && lekua !== 'Por confirmar') lines.push('\uD83D\uDCCD Lekua: ' + lekua);
-    else if(e.location) lines.push('\uD83D\uDCCD Lekua: ' + e.location);
-    if(mapsUrls[idx]) lines.push('\uD83D\uDDFA\uFE0F Mapa: ' + mapsUrls[idx]);
-    if(anims) lines.push('\uD83D\uDC64 Animatzailea: ' + anims);
-    if(djs)   lines.push('\uD83C\uDFA7 DJ-a: ' + djs);
-    if(persona) {
+
+async function msgBezeroa() {
+  const lines = ['🎉 *diskofesta.eus*', resumen(RESULTS, true)];
+  const f = describirFiltros(true);
+  if (f.length) lines.push('🔍 Iragazkiak: ' + f.join(' | '));
+  const persona = personaConTarifa();
+  const mapas = await mapasDeResultados();
+  RESULTS.forEach(function (e, i) {
+    lines.push('', '────────────');
+    lines.push('📅 *' + formatFechaSlash(e.fecha) + '*' + (e._pueblo ? ' • ' + e._pueblo : ''));
+    const h = formatHorario(e.hora_inicio, e.hora_final);
+    if (h) lines.push('🕐 Ordutegia: ' + h.replace('–', ' – '));
+    if (e._lekua) lines.push('📍 Lekua: ' + e._lekua);
+    if (mapas[i]) lines.push('🗺️ Mapa: ' + mapas[i]);
+    if (e._animsStr) lines.push('👤 Animatzailea: ' + e._animsStr);
+    if (e._djsStr) lines.push('🎧 DJ-a: ' + e._djsStr);
+    if (persona) {
       const p = getPrecio(e, persona);
-      if(p) {
-        if(p.rango) lines.push('\uD83D\uDCB6 Prezioa: ' + p.precioMin + '\u2013' + p.precioMax + '\u20AC (' + formatTarifa(p.tarifaKey) + ', probintzia?)');
-        else        lines.push('\uD83D\uDCB6 Prezioa: ' + p.precio + '\u20AC (' + formatTarifa(p.tarifaKey) + (p.provincia?(', '+p.provincia):'') + ')');
-      }
+      if (p) lines.push('💶 Prezioa: ' + (p.rango
+        ? p.precioMin + '–' + p.precioMax + '€ (' + formatTarifa(p.tarifaKey) + ', probintzia?)'
+        : p.precio + '€ (' + formatTarifa(p.tarifaKey) + (p.provincia ? ', ' + p.provincia : '') + ')'));
     }
-    lines.push('\uD83D\uDCDE Kontaktua: ' + getKontaktua(e));
-    const notasLimpias = e.notas ? e.notas.replace(/\[Original:.*?\]/g,'').replace(/Ubicacion:[^|]*/g,'').replace(/\|\s*\|/g,'|').replace(/^\s*\|\s*|\s*\|\s*$/g,'').trim() : '';
-    if(notasLimpias) lines.push('\uD83D\uDCDD Oharrak: ' + notasLimpias);
+    lines.push('📞 Kontaktua: ' + getKontaktua(e));
+    if (e._notas) lines.push('📝 Oharrak: ' + e._notas);
   });
   return lines.join('\n');
 }
-function buildMsgCompacto() {
-  const lines = ['\uD83C\uDF89 *Diskofestas - Arima Cool Tour*', buildResumen(CURRENT_RESULTS)];
-  const filtros = describirFiltros();
-  if(filtros.length) lines.push('\uD83D\uDD0D Filtros: ' + filtros.join(' | '));
-  // Forzar orden por fecha para agrupar (W3)
-  const sorted = CURRENT_RESULTS.slice().sort((a,b)=>a.fecha.localeCompare(b.fecha));
+
+function msgCompacto() {
+  const lines = ['🎉 *Diskofestas - Arima Cool Tour*', resumen(RESULTS, false)];
+  const f = describirFiltros(false);
+  if (f.length) lines.push('🔍 Filtros: ' + f.join(' | '));
+  const sorted = RESULTS.slice().sort((a, b) => a.fecha.localeCompare(b.fecha) || (a.hora_inicio || '').localeCompare(b.hora_inicio || ''));
   let mesActual = null;
-  sorted.forEach(e => {
+  sorted.forEach(function (e) {
     const k = claveMes(e.fecha);
-    if(k !== mesActual) {
-      mesActual = k;
-      lines.push('');
-      lines.push('\uD83D\uDDD3\uFE0F *' + nombreMes(e.fecha).toUpperCase() + '*');
-    }
-    const anims = animadoresDe(e).join(' + ');
-    const djs = djsDe(e).join(' + ');
-    const horario = formatHorario(e.hora_inicio, e.hora_final);
-    let line = '\u2022 ' + formatFechaCorta(e.fecha) + ' ' + horario + ' \uD83C\uDFD8\uFE0F ' + (e.pueblo||'');
-    if(anims) line += ' \uD83D\uDC64 ' + anims;
-    if(djs)   line += ' \uD83C\uDFA7 ' + djs;
+    if (k !== mesActual) { mesActual = k; lines.push('', '🗓️ *' + nombreMes(e.fecha).toUpperCase() + '*'); }
+    let line = '• ' + formatFechaCorta(e.fecha) + ' ' + formatHorario(e.hora_inicio, e.hora_final) + ' 🏘️ ' + (e._pueblo || '');
+    if (e._animsStr) line += ' 👤 ' + e._animsStr;
+    else line += ' ⚠️ sin animador';
+    if (e._djsStr) line += ' 🎧 ' + e._djsStr;
     lines.push(line);
   });
   return lines.join('\n');
 }
-function buildMsgPorAnimador() {
-  const lines = ['\uD83C\uDF89 *Diskofestas - Arima Cool Tour*', buildResumen(CURRENT_RESULTS)];
-  const filtros = describirFiltros();
-  if(filtros.length) lines.push('\uD83D\uDD0D Filtros: ' + filtros.join(' | '));
+
+function msgPorAnimador() {
+  const lines = ['🎉 *Diskofestas - Arima Cool Tour*', resumen(RESULTS, false)];
+  const f = describirFiltros(false);
+  if (f.length) lines.push('🔍 Filtros: ' + f.join(' | '));
   const porAnim = new Map();
-  CURRENT_RESULTS.forEach(e => {
-    const anims = animadoresDe(e);
-    const lista = anims.length ? anims : ['(sin animador)'];
-    lista.forEach(a => {
-      if(!porAnim.has(a)) porAnim.set(a, []);
+  RESULTS.forEach(function (e) {
+    (e._anims.length ? e._anims : ['⚠️ Sin animador']).forEach(function (a) {
+      if (!porAnim.has(a)) porAnim.set(a, []);
       porAnim.get(a).push(e);
     });
   });
-  [...porAnim.keys()].sort((a,b)=>a.localeCompare(b,'es')).forEach(a => {
-    const evs = porAnim.get(a).slice().sort((x,y)=>x.fecha.localeCompare(y.fecha));
-    lines.push('');
-    lines.push('\uD83D\uDC64 *' + a + '* — ' + evs.length + ' disko' + (evs.length===1?'':'s'));
-    evs.forEach(e => {
-      const djs = djsDe(e).join(' + ');
-      const horario = formatHorario(e.hora_inicio, e.hora_final);
-      let line = '  \u2022 ' + formatFechaCorta(e.fecha) + ' ' + horario + ' \uD83C\uDFD8\uFE0F ' + (e.pueblo||'');
-      if(djs) line += ' \uD83C\uDFA7 ' + djs;
+  [...porAnim.keys()].sort((a, b) => a.localeCompare(b, 'es')).forEach(function (a) {
+    const evs = porAnim.get(a).slice().sort((x, y) => x.fecha.localeCompare(y.fecha));
+    lines.push('', '👤 *' + a + '* — ' + plural(evs.length, 'disko', 'diskos'));
+    evs.forEach(function (e) {
+      let line = '  • ' + formatFechaCorta(e.fecha) + ' ' + formatHorario(e.hora_inicio, e.hora_final) + ' 🏘️ ' + (e._pueblo || '');
+      if (e._djsStr) line += ' 🎧 ' + e._djsStr;
       lines.push(line);
     });
   });
   return lines.join('\n');
 }
 
-// (legacy: no longer wired up — el botón FAB ahora llama a openShareModal)
-async function shareResults() {
-  const fa = $('fAnimador').value.trim();
-  const fd = $('fDJ').value.trim();
-  const fp = $('fPueblo').value.trim();
-  const fD = $('fDesde').value;
-  const fH = $('fHasta').value;
-  const fT = $('fTexto').value.trim();
+const MODOS = [
+  { id: 'detallado', icon: '📋', titulo: 'Detallado', desc: 'Todo de cada disko: lekua, ordutegia, muntaia, animador, DJ, prezioa, kontaktua, oharrak.' },
+  { id: 'bezeroa', icon: '🤝', titulo: 'Bezeroa (euskaraz)', desc: 'Bezeroari bidaltzeko: dena euskaraz, data urtea/hilabetea/eguna, diskofesta.eus marka.' },
+  { id: 'compacto', icon: '📄', titulo: 'Compacto (por mes)', desc: 'Una línea por disko, agrupado por mes. Ideal para agendas largas.' },
+  { id: 'por_animador', icon: '👤', titulo: 'Agrupado por animador', desc: 'Cada animador con sus diskos en orden de fecha.' }
+];
 
-  const n = CURRENT_RESULTS.length;
-  if(!n){ alert('No hay resultados para compartir.'); return; }
+let modalAbierto = false, modalEnHistorial = false, ultimoFoco = null;
 
-  let filtrosDesc = [];
-  if(fa) filtrosDesc.push('Animador: ' + fa);
-  if(fd) filtrosDesc.push('DJ: ' + fd);
-  if(fp) filtrosDesc.push('Bezeroa: ' + fp);
-  if(fD) filtrosDesc.push('Desde: ' + fD);
-  if(fH) filtrosDesc.push('Hasta: ' + fH);
-  if(fT) filtrosDesc.push('Texto: ' + fT);
-
-  // Modo DETALLADO: cuando hay Bezeroa seleccionado, se incluye info completa
-  // por evento (lugar, fecha, hora inicio/final, hora montaje, matricula,
-  // kontaktua, aparkatzeko, notas, precio).
-  const modoDetalle = !!fp;
-
-  let lines = ['\uD83C\uDF89 *Diskofestas - Arima Cool Tour*'];
-  if(filtrosDesc.length) lines.push('Filtros: ' + filtrosDesc.join(' | '));
-  lines.push(n + ' evento' + (n===1?'':'s') + ':');
-
-  const persona = getPersonaConTarifa();
-
-  CURRENT_RESULTS.forEach(function(e, idx) {
-    const anims = animadoresDe(e).join(' + ') || '';
-    const djs   = djsDe(e).join(' + ') || '';
-    if(modoDetalle) {
-      lines.push('');
-      lines.push('\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500');
-      lines.push('\uD83D\uDCC5 *' + formatFechaCorta(e.fecha) + '*' + (e.pueblo ? ' \u2022 ' + e.pueblo : ''));
-      const hi = e.hora_inicio || '';
-      const hf = e.hora_final  || '';
-      if(hi || hf) {
-        let hLine = '\uD83D\uDD50 Ordutegia: ';
-        if(hi && hf) hLine += hi + ' \u2013 ' + hf;
-        else hLine += (hi || hf);
-        lines.push(hLine);
-      }
-      if(hi) {
-        const montaje = addMinutes(hi, -90);
-        if(montaje) lines.push('\uD83D\uDEE0\uFE0F Muntaia: ' + montaje + ' (ordu eta erdi lehenago)');
-      }
-      const lekua = getLekua(e);
-      if(lekua && lekua !== 'Por confirmar') lines.push('\uD83D\uDCCD Lekua: ' + lekua);
-      else if(e.location) lines.push('\uD83D\uDCCD Lekua: ' + e.location);
-      if(anims) lines.push('\uD83D\uDC64 Animatzailea: ' + anims);
-      if(djs)   lines.push('\uD83C\uDFA7 DJ: ' + djs);
-      if(persona) {
-        const p = getPrecio(e, persona);
-        if(p) {
-          if(p.rango) lines.push('\uD83D\uDCB6 Prezioa: ' + p.precioMin + '\u2013' + p.precioMax + '\u20AC (' + formatTarifa(p.tarifaKey) + ', prov.?)');
-          else        lines.push('\uD83D\uDCB6 Prezioa: ' + p.precio + '\u20AC (' + formatTarifa(p.tarifaKey) + (p.provincia?(', '+p.provincia):'') + ')');
-        }
-      }
-      lines.push('\uD83D\uDE90 Furgoneta: ' + getAparkatzeko(e));
-      lines.push('\uD83D\uDCDE Kontaktua: ' + getKontaktua(e));
-      const notasLimpias = e.notas ? e.notas.replace(/\[Original:.*?\]/g,'').replace(/Ubicacion:[^|]*/g,'').replace(/\|\s*\|/g,'|').replace(/^\s*\|\s*|\s*\|\s*$/g,'').trim() : '';
-      if(notasLimpias) lines.push('\uD83D\uDCDD Oharrak: ' + notasLimpias);
-    } else {
-      let line = '\uD83D\uDCC5 ' + formatFechaCorta(e.fecha) + ' ' + (e.hora_inicio||'') + ' \uD83C\uDFF8\uFE0F ' + (e.pueblo||'');
-      if(anims) line += ' \uD83D\uDC64 ' + anims;
-      if(djs)   line += ' \uD83C\uDFA7 ' + djs;
-      lines.push(line);
-    }
-  });
-
-  const msg = lines.join('\n');
-  const waUrl = 'https://wa.me/?text=' + encodeURIComponent(msg);
-  window.open(waUrl, '_blank');
+function abrirModal(html) {
+  const modal = $('shareModal');
+  $('shareModalCard').innerHTML = html;
+  if (!modalAbierto) {
+    ultimoFoco = document.activeElement;
+    modal.classList.add('visible');
+    modalAbierto = true;
+    try { history.pushState({ diskoModal: 1 }, ''); modalEnHistorial = true; } catch (e) { modalEnHistorial = false; }
+  }
+  const primero = $('shareModalCard').querySelector('button');
+  if (primero) primero.focus();
+}
+function cerrarModal(desdePopstate) {
+  if (!modalAbierto) return;
+  modalAbierto = false;
+  $('shareModal').classList.remove('visible');
+  $('shareModalCard').innerHTML = '';
+  if (!desdePopstate && modalEnHistorial) { try { history.back(); } catch (e) {} }
+  modalEnHistorial = false;
+  if (ultimoFoco && ultimoFoco.focus) ultimoFoco.focus();
 }
 
-// ===== INICIALIZACION =====
-function init() {
-  // Fecha de hoy en el header
-  const hoy = new Date();
-  const dias = ['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
-  document.getElementById('fechaHoy').textContent = dias[hoy.getDay()] + ' ' + hoy.toLocaleDateString('es-ES', {day:'2-digit', month:'2-digit', year:'numeric'});
-  document.getElementById('totalEvents').textContent = EVENTS_DATA.length;
-  document.getElementById('lastUpdate').textContent = GENERATED_AT;
+function pantallaModos() {
+  const n = RESULTS.length;
+  return '<h3 id="shareModalTitle">📤 ¿Cómo quieres compartir?</h3>' +
+    '<div class="sub">' + plural(n, 'disko seleccionada', 'diskos seleccionadas') + '. Verás una vista previa antes de enviar.</div>' +
+    MODOS.map(m => '<button type="button" class="mode-btn" data-mode="' + m.id + '">' +
+      '<span class="mode-icon" aria-hidden="true">' + m.icon + '</span>' +
+      '<span><span class="mode-title">' + m.titulo + '</span><span class="mode-desc">' + m.desc + '</span></span></button>').join('') +
+    '<button type="button" class="modal-cancel" data-cerrar="1">Cancelar</button>';
+}
 
-  // Filtro "Desde hoy" por defecto (se sobrescribirá si hay estado guardado)
-  document.getElementById('fDesde').value = hoyISO();
+function abrirCompartir() {
+  if (!RESULTS.length) { toast('No hay diskos que compartir'); return; }
+  abrirModal(pantallaModos());
+}
 
-  // Restaurar estado guardado (F4) antes de poblar y filtrar
-  loadState();
-
-  // Poblar select de Bezeroa y datalists de animador/DJ
-  populateSelects();
-
-  // Atajos rapidos de fecha (F1)
-  document.querySelectorAll('.date-chip').forEach(chip => {
-    chip.addEventListener('click', () => applyDateShortcut(chip.dataset.shortcut));
-  });
-
-  // Toggle "Ver pasados" (F3)
-  const togglePasados = document.getElementById('tPasados');
-  function setPasados(on) {
-    VER_PASADOS = !!on;
-    togglePasados.classList.toggle('on', VER_PASADOS);
-    togglePasados.setAttribute('aria-checked', VER_PASADOS ? 'true' : 'false');
-    if(!VER_PASADOS) {
-      const fDesde = document.getElementById('fDesde');
-      if(!fDesde.value || fDesde.value < hoyISO()) fDesde.value = hoyISO();
-    }
-    populateSelects();
-    applyFilters();
+let MSG_ACTUAL = '';
+async function prepararMensaje(mode) {
+  const etiqueta = (MODOS.find(m => m.id === mode) || {}).titulo || mode;
+  $('shareModalCard').innerHTML = '<div class="loading"><span class="spin"></span>Preparando mensaje (' + escapeHtml(etiqueta) + ')…</div>';
+  let msg;
+  try {
+    if (mode === 'detallado') msg = await msgDetallado();
+    else if (mode === 'bezeroa') msg = await msgBezeroa();
+    else if (mode === 'compacto') msg = msgCompacto();
+    else msg = msgPorAnimador();
+  } catch (err) {
+    $('shareModalCard').innerHTML = '<h3 id="shareModalTitle">No se pudo preparar el mensaje</h3><div class="sub">' + escapeHtml((err && err.message) || String(err)) + '</div><button type="button" class="modal-cancel" data-cerrar="1">Cerrar</button>';
+    return;
   }
-  togglePasados.addEventListener('click', () => setPasados(!VER_PASADOS));
-  togglePasados.addEventListener('keydown', (e) => {
-    if(e.key===' '||e.key==='Enter'){ e.preventDefault(); setPasados(!VER_PASADOS); }
+  MSG_ACTUAL = msg;
+  const aviso = msg.length > AVISO_LARGO
+    ? '<div class="aviso-largo">⚠️ El mensaje es muy largo (' + msg.length.toLocaleString('es-ES') + ' caracteres) y WhatsApp puede cortarlo. Mejor <b>cópialo</b> y pégalo en el chat, o filtra menos diskos.</div>'
+    : '';
+  $('shareModalCard').innerHTML =
+    '<h3 id="shareModalTitle">👁️ Vista previa — ' + escapeHtml(etiqueta) + '</h3>' +
+    '<div class="sub">' + plural(RESULTS.length, 'disko', 'diskos') + ' · ' + msg.length.toLocaleString('es-ES') + ' caracteres</div>' +
+    aviso +
+    '<div class="preview-box" id="previewBox">' + escapeHtml(msg) + '</div>' +
+    '<div class="preview-actions">' +
+      '<button type="button" class="btn-copy" data-copiar="1">📋 Copiar</button>' +
+      '<button type="button" class="btn-wa" data-whatsapp="1">Abrir WhatsApp</button>' +
+    '</div>' +
+    '<button type="button" class="modal-cancel" data-volver="1">‹ Elegir otro formato</button>';
+}
+
+async function copiarMensaje(btn) {
+  let ok = false;
+  try {
+    if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(MSG_ACTUAL); ok = true; }
+  } catch (e) { ok = false; }
+  if (!ok) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = MSG_ACTUAL;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+      document.body.appendChild(ta);
+      ta.select(); ta.setSelectionRange(0, ta.value.length);
+      ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+    } catch (e) { ok = false; }
+  }
+  if (ok) {
+    btn.classList.add('ok');
+    btn.textContent = '✓ Copiado';
+    setTimeout(() => { btn.classList.remove('ok'); btn.textContent = '📋 Copiar'; }, 2200);
+    toast('Mensaje copiado al portapapeles');
+  } else {
+    toast('No se pudo copiar: selecciona el texto y cópialo a mano');
+  }
+}
+
+function abrirWhatsApp() {
+  // Se llama SIEMPRE dentro del gesto del usuario (sin await por delante),
+  // para que el navegador no bloquee la apertura.
+  const url = 'https://wa.me/?text=' + encodeURIComponent(MSG_ACTUAL);
+  const w = window.open(url, '_blank', 'noopener');
+  if (!w) window.location.href = url;
+  cerrarModal();
+}
+
+// =====================================================================
+//  TOAST
+// =====================================================================
+let toastId = null;
+function toast(txt) {
+  const t = $('toast');
+  t.textContent = txt;
+  t.classList.add('visible');
+  clearTimeout(toastId);
+  toastId = setTimeout(() => t.classList.remove('visible'), 2400);
+}
+
+// =====================================================================
+//  INICIALIZACIÓN
+// =====================================================================
+function init() {
+  const hoy = new Date();
+  $('fechaHoy').textContent = DIAS_CORTO[hoy.getDay()] + ' ' + pad2(hoy.getDate()) + '/' + pad2(hoy.getMonth() + 1) + '/' + hoy.getFullYear();
+  $('totalAll').textContent = EVENTS.length;
+  $('totalEvents').textContent = EVENTS.filter(e => e.fecha >= hoyISO()).length;
+  $('lastUpdate').textContent = GENERATED_AT;
+
+  S.desde = hoyISO();
+  cargarEstado();
+  escribirDOM();
+  poblarListas();
+  escribirDOM();
+  aplicar(false);
+
+  // Altura real de la cabecera para que los meses pegajosos no la tapen
+  const header = $('appHeader');
+  const ajustarAltura = () => document.documentElement.style.setProperty('--header-h', header.offsetHeight + 'px');
+  ajustarAltura();
+  if (window.ResizeObserver) new ResizeObserver(ajustarAltura).observe(header);
+  else window.addEventListener('resize', ajustarAltura);
+
+  // --- Buscador ---
+  $('fBuscar').addEventListener('input', function () {
+    $('btnClearSearch').classList.toggle('visible', !!this.value);
+    aplicarDebounced();
+  });
+  $('fBuscar').addEventListener('search', aplicarYa);
+  $('btnClearSearch').addEventListener('click', function () {
+    S.buscar = ''; $('fBuscar').value = ''; this.classList.remove('visible');
+    $('fBuscar').focus(); aplicar();
   });
 
-  // Aplicar filtros iniciales (despues de loadState + populateSelects)
-  applyFilters();
+  // --- Filtros ---
+  $('fAnimador').addEventListener('input', aplicarDebounced);
+  $('fDJ').addEventListener('input', aplicarDebounced);
+  $('fPueblo').addEventListener('change', aplicarYa);
+  $('fOrden').addEventListener('change', aplicarYa);
+  $('fDesde').addEventListener('change', function () { leerDOM(); S.atajo = ''; aplicar(); });
+  $('fHasta').addEventListener('change', function () { leerDOM(); S.atajo = ''; aplicar(); });
+  $('btnLimpiar').addEventListener('click', limpiarFiltros);
 
-  // Botones de filtro
-  document.getElementById('btnAplicar').addEventListener('click', applyFilters);
-  document.getElementById('btnLimpiar').addEventListener('click', limpiarFiltros);
-
-  // Filtrado en tiempo real (animador/DJ son inputs de texto)
-  document.getElementById('fAnimador').addEventListener('input', applyFilters);
-  document.getElementById('fDJ').addEventListener('input', applyFilters);
-  document.getElementById('fPueblo').addEventListener('change', applyFilters);
-  document.getElementById('fDesde').addEventListener('change', applyFilters);
-  document.getElementById('fHasta').addEventListener('change', applyFilters);
-  document.getElementById('fTexto').addEventListener('input', applyFilters);
-  document.getElementById('fOrden').addEventListener('change', applyFilters);
-
-  // Toggle filtros
-  document.getElementById('btnToggleFilters').addEventListener('click', function() {
-    const body = document.getElementById('filtersBody');
-    const collapsed = body.classList.toggle('collapsed');
-    this.textContent = collapsed ? '▼' : '▲';
+  $('dateShortcuts').addEventListener('click', function (ev) {
+    const chip = ev.target.closest('.date-chip');
+    if (!chip) return;
+    if (S.atajo === chip.dataset.shortcut) { S.atajo = ''; S.desde = S.pasados ? '' : hoyISO(); S.hasta = ''; escribirDOM(); aplicar(); }
+    else atajoFecha(chip.dataset.shortcut);
   });
 
-  // Boton compartir WhatsApp -> abre el modal de modos (W1)
-  document.getElementById('btnShare').addEventListener('click', openShareModal);
+  // --- Interruptores ---
+  function togglePasados() {
+    S.pasados = !S.pasados;
+    if (!S.pasados && (!S.desde || S.desde < hoyISO())) { S.desde = hoyISO(); S.atajo = ''; }
+    if (S.pasados && S.desde === hoyISO() && !S.atajo) S.desde = '';
+    escribirDOM(); poblarListas(); escribirDOM(); aplicar();
+  }
+  function toggleSinAnim() {
+    S.soloSinAnim = !S.soloSinAnim;
+    escribirDOM(); aplicar();
+  }
+  $('tPasados').addEventListener('click', togglePasados);
+  $('rowPasados').addEventListener('click', function (e) { if (e.target === this || e.target.classList.contains('tl') || e.target.tagName === 'B') togglePasados(); });
+  $('tSinAnim').addEventListener('click', toggleSinAnim);
+  $('rowSinAnim').addEventListener('click', function (e) { if (e.target === this || e.target.classList.contains('tl') || e.target.tagName === 'B') toggleSinAnim(); });
+  $('btnVerSinAnim').addEventListener('click', function () {
+    S.soloSinAnim = true;
+    if (!S.pasados && (!S.desde || S.desde < hoyISO())) S.desde = hoyISO();
+    escribirDOM(); aplicar();
+    $('results').scrollIntoView({ block: 'start' });
+  });
 
-  // PWA install
-  let deferredPrompt;
-  window.addEventListener('beforeinstallprompt', function(e) {
+  // --- Plegar/desplegar filtros (un solo listener) ---
+  $('btnToggleFilters').addEventListener('click', function () {
+    const body = $('filtersBody');
+    const colapsado = body.classList.toggle('collapsed');
+    this.setAttribute('aria-expanded', colapsado ? 'false' : 'true');
+    $('toggleTxt').textContent = colapsado ? 'Mostrar' : 'Ocultar';
+    this.querySelector('.caret').textContent = colapsado ? '▼' : '▲';
+  });
+
+  // --- Chips de filtros activos (delegación) ---
+  $('activeFilters').addEventListener('click', function (ev) {
+    const chip = ev.target.closest('[data-quitar]');
+    if (!chip) return;
+    const campo = chip.dataset.quitar;
+    if (campo === 'todo') { limpiarFiltros(); return; }
+    if (campo === 'fechas') { S.desde = S.pasados ? '' : hoyISO(); S.hasta = ''; S.atajo = ''; }
+    else if (campo === 'orden') S.orden = 'fecha';
+    else if (campo === 'pasados') { S.pasados = false; if (!S.desde || S.desde < hoyISO()) S.desde = hoyISO(); poblarListas(); }
+    else if (campo === 'soloSinAnim') S.soloSinAnim = false;
+    else S[campo] = '';
+    escribirDOM();
+    aplicar();
+  });
+
+  // --- Resultados: expandir tarjeta y acciones del estado vacío (delegación) ---
+  $('results').addEventListener('click', function (ev) {
+    const accion = ev.target.closest('[data-accion]');
+    if (accion) {
+      const a = accion.dataset.accion;
+      if (a === 'limpiar') limpiarFiltros();
+      else if (a === 'pasados') { S.pasados = true; S.desde = ''; S.atajo = ''; escribirDOM(); poblarListas(); escribirDOM(); aplicar(); }
+      else if (a === 'todo') { S.desde = hoyISO(); S.hasta = ''; S.atajo = ''; escribirDOM(); aplicar(); }
+      return;
+    }
+    const btn = ev.target.closest('[data-expand]');
+    if (!btn) return;
+    const card = btn.closest('.event-card');
+    const abierto = card.classList.toggle('expanded');
+    btn.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+    btn.firstChild.nodeValue = abierto ? 'Ocultar detalles ' : 'Ver detalles ';
+  });
+
+  // --- Compartir ---
+  $('btnShare').addEventListener('click', abrirCompartir);
+  $('shareModal').addEventListener('click', function (ev) {
+    if (ev.target === this) { cerrarModal(); return; }
+    if (ev.target.closest('[data-cerrar]')) { cerrarModal(); return; }
+    if (ev.target.closest('[data-volver]')) { abrirModal(pantallaModos()); return; }
+    if (ev.target.closest('[data-whatsapp]')) { abrirWhatsApp(); return; }
+    const copiar = ev.target.closest('[data-copiar]');
+    if (copiar) { copiarMensaje(copiar); return; }
+    const modo = ev.target.closest('[data-mode]');
+    if (modo) prepararMensaje(modo.dataset.mode);
+  });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape' && modalAbierto) { ev.preventDefault(); cerrarModal(); }
+  });
+  window.addEventListener('popstate', function () { if (modalAbierto) cerrarModal(true); });
+
+  // --- Volver arriba ---
+  const toTop = $('btnToTop');
+  toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  let ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      toTop.classList.toggle('visible', window.scrollY > 600);
+      ticking = false;
+    });
+  }, { passive: true });
+
+  // --- Instalación PWA ---
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function (e) {
     e.preventDefault();
     deferredPrompt = e;
-    document.getElementById('installBanner').classList.add('visible');
+    $('installBanner').classList.add('visible');
   });
-  document.getElementById('btnInstall').addEventListener('click', async function() {
-    if(!deferredPrompt) return;
+  $('btnInstall').addEventListener('click', async function () {
+    if (!deferredPrompt) { $('installBanner').classList.remove('visible'); return; }
     deferredPrompt.prompt();
     const result = await deferredPrompt.userChoice;
-    if(result.outcome === 'accepted') document.getElementById('installBanner').classList.remove('visible');
+    if (result.outcome === 'accepted') $('installBanner').classList.remove('visible');
     deferredPrompt = null;
   });
 }
